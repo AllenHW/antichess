@@ -1,4 +1,5 @@
 import chess
+import chess.variant as variant
 
 import sys
 
@@ -8,13 +9,50 @@ if __name__ == "__main__":
 
     # Commandline Parse
 
-    if len(args) != 2:
-        print "Usage: antichess <color>"
-        print "One of (b,w,black,white)"
-
+    if len(args) < 2:
+        print "Usage: antichess <colour>"
+        print "One of (b, w, black, white)"
         exit(0)
 
-    color = args[1].lower()
+    colour = args[1].lower()
 
-    # Start the game
-    
+    if colour != 'w' and colour != 'b' and \
+            colour != 'white' and colour != 'black':
+        print "Usage: antichess <colour>"
+        print "One of (b, w, black, white)"
+        exit(0)
+
+    # if len(args) >= 3 and args[2] == "debug":
+    #     debug = True
+    # else:
+    #     debug = False
+
+    # Player colour
+    is_white = (colour == 'w' or colour == 'white')
+
+    # Initialize the board
+    # TODO: Initialize our antichess variant
+    board = chess.Board()
+
+    # Input loop
+    while not board.is_game_over():
+        print board
+        if is_white == board.turn:
+            # It's our turn
+            print "Our Turn!"
+
+            # TODO: Call our move generation
+            break
+        else:
+            # Not our turn wait for their input
+            while True:
+                enemy_move = raw_input("Move: ")
+
+                try:
+                    board.push_uci(enemy_move)
+                    break
+                except ValueError:
+                    print ("Illegal Move")
+                    continue
+
+        print("")
