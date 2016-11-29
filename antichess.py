@@ -4,6 +4,10 @@ import antichess_board
 import sys
 
 
+def print_legal_moves(board):
+    for move in board.legal_moves:
+        print move
+
 if __name__ == "__main__":
     args = sys.argv
 
@@ -41,8 +45,16 @@ if __name__ == "__main__":
             # It's our turn
             print "Our Turn!"
 
-            # TODO: Call our move generation
-            break
+            while True:
+                move = raw_input("Our Move: ")
+
+                try:
+                    board.push_uci(move)
+                    break
+                except ValueError:
+                    print ("Illegal Move")
+                    print_legal_moves(board)
+                    continue
         else:
             # Not our turn wait for their input
             while True:
@@ -53,6 +65,7 @@ if __name__ == "__main__":
                     break
                 except ValueError:
                     print ("Illegal Move")
+                    print_legal_moves(board)
                     continue
 
         print("")
