@@ -1,5 +1,5 @@
-import chess
-import chess.variant as variant
+from python_chess import chess
+import antichess_board
 
 import sys
 
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     # Initialize the board
     # TODO: Initialize our antichess variant
-    board = chess.Board()
+    board = antichess_board.AntichessBoard()
 
     # Input loop
     while not board.is_game_over():

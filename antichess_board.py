@@ -1,4 +1,4 @@
-import chess
+from python_chess import chess
 import copy
 import itertools
 
@@ -24,6 +24,7 @@ class AntichessBoard(chess.Board):
             found_capture = True
 
         if not found_capture:
+            not_them = to_mask & ~self.occupied_co[not self.turn]
             for move in super(Antichess, self).generate_evasions(from_mask, not_them):
                 yield move
 
@@ -35,6 +36,7 @@ class AntichessBoard(chess.Board):
             found_capture = True
 
         if not found_capture:
-            for move in super(Antichess, self).generate_non_evasions(from_mask, not_them):
+            not_them = to_mask & ~self.occupied_co[not self.turn]
+            for move in super(AntichessBoard, self).generate_non_evasions(from_mask, not_them):
                 yield move
 
