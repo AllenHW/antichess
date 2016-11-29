@@ -22,11 +22,11 @@ class AntichessBoard(chess.Board):
             return not any(self.generate_pseudo_legal_captures())
 
     def generate_evasions(self, from_mask=chess.BB_ALL, to_mask=chess.BB_ALL):
-        them = to_mask & self.occupied_co[not self.turn]
         found_capture = False
         for move in super(AntichessBoard, self).generate_evasions(from_mask, them):
-            yield move
-            found_capture = True
+            if self.is_capture(move):
+                yield move
+                found_capture = True
 
         if not found_capture:
             not_them = to_mask & ~self.occupied_co[not self.turn]
@@ -34,11 +34,11 @@ class AntichessBoard(chess.Board):
                 yield move
 
     def generate_non_evasions(self, from_mask=chess.BB_ALL, to_mask=chess.BB_ALL):
-        them = to_mask & self.occupied_co[not self.turn]
         found_capture = False
-        for move in super(AntichessBoard, self).generate_non_evasions(from_mask, them):
-            yield move
-            found_capture = True
+        for move in super(AntichessBoard, self).generate_non_evasions(from_mask, to_mask):
+            if self.is_capture(move):
+                yield move
+                found_capture = True
 
         if not found_capture:
             not_them = to_mask & ~self.occupied_co[not self.turn]
