@@ -10,14 +10,14 @@ class AlphaBeta:
         for move in board.legal_moves:
             child_board = board.copy()
             child_board.push(move)
-            utility = min_alpha_beta(child_board, 0, float('-inf'), float('inf'))
-            if best_move[1] > utility:
+            utility = self.min_alpha_beta(child_board, 0, float('-inf'), float('inf'))
+            if best_move[1] < utility:
                 best_move = (move, utility)
 
         return best_move[0]
 
     def min_max(self):
-        return max_alpha_beta(self.board, 0, float('-inf'), float('inf'))
+        return self.max_alpha_beta(self.board, 0, float('-inf'), float('inf'))
 
     def max_alpha_beta(self, board, curr_depth, alpha, beta):
         if curr_depth == self.depth:
@@ -27,7 +27,7 @@ class AlphaBeta:
         for move in board.legal_moves:
             child_board = board.copy()
             child_board.push(move)
-            value = max(value, min_alpha_beta(child_board, curr_depth+1, value, beta))
+            value = max(value, self.min_alpha_beta(child_board, curr_depth+1, value, beta))
             if value >= beta:
                 break
 
@@ -42,7 +42,7 @@ class AlphaBeta:
         for move in board.legal_moves:
             child_board = board.copy()
             child_board.push(move)
-            value = min(value, max_alpha_beta(child_board, curr_depth+1, alpha, value))
+            value = min(value, self.max_alpha_beta(child_board, curr_depth+1, alpha, value))
             if value <= alpha:
                 break
 

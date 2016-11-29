@@ -1,5 +1,6 @@
 from python_chess import chess
 import antichess_board
+import minmax
 
 import random
 import sys
@@ -58,7 +59,9 @@ if __name__ == "__main__":
 
             while True:
                 #move = raw_input("Our Move: ")
-                move = make_random_move(board)
+                # move = make_random_move(board)
+                ab = minmax.AlphaBeta(3, board)
+                move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(move)
@@ -72,7 +75,9 @@ if __name__ == "__main__":
             # Not our turn wait for their input
             while True:
                 # enemy_move = raw_input("Move: ")
-                enemy_move = make_random_move(board)
+                # enemy_move = make_random_move(board)
+                ab = minmax.AlphaBeta(3, board)
+                enemy_move = str(ab.get_best_move(board))
                 print enemy_move
 
                 try:
@@ -85,3 +90,7 @@ if __name__ == "__main__":
                     continue
 
         print("")
+
+    print("Final Board:")
+    print(board)
+    print("GAME OVER!")
