@@ -11,7 +11,7 @@ class AlphaBeta:
             child_board = board.copy()
             child_board.push(move)
             utility = self.min_alpha_beta(child_board, 0, float('-inf'), float('inf'))
-            if best_move[1] < utility:
+            if best_move[1] <= utility:
                 best_move = (move, utility)
 
         return best_move[0]
