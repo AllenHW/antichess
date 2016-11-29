@@ -1,7 +1,18 @@
 from python_chess import chess
 import antichess_board
 
+import random
 import sys
+
+
+def make_random_move(board):
+    moves = list(board.legal_moves)
+
+    if moves:
+        move_index = random.randint(0, len(moves)-1)
+        return str(moves[move_index])
+
+    return None
 
 
 def print_legal_moves(board):
@@ -46,25 +57,30 @@ if __name__ == "__main__":
             print "Our Turn!"
 
             while True:
-                move = raw_input("Our Move: ")
+                #move = raw_input("Our Move: ")
+                move = make_random_move(board)
 
                 try:
-                    board.push_uci(move)
+                    m = board.push_uci(move)
+                    print "MOVED: %s" % m
                     break
                 except ValueError:
-                    print ("Illegal Move")
+                    print ("Illegal Move: %s" % move)
                     print_legal_moves(board)
                     continue
         else:
             # Not our turn wait for their input
             while True:
-                enemy_move = raw_input("Move: ")
+                # enemy_move = raw_input("Move: ")
+                enemy_move = make_random_move(board)
+                print enemy_move
 
                 try:
-                    board.push_uci(enemy_move)
+                    m = board.push_uci(enemy_move)
+                    print "MOVED: %s" % m
                     break
                 except ValueError:
-                    print ("Illegal Move")
+                    print ("Illegal Move: %s" % move)
                     print_legal_moves(board)
                     continue
 
