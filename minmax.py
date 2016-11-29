@@ -50,4 +50,32 @@ class AlphaBeta:
 
 
 def evaluate_board(board):
-    return 0
+    position_value = 0
+
+    # Basic inverse piece valuation
+    active_pieces = board.occupied_co[board.turn]
+
+    # Pawns
+    pawns = active_pieces & board.pawns
+    pawns_value = bin(pawns).count('1')
+
+    # Knight
+    knights = active_pieces & board.knights
+    knights_value = bin(knights).count('1') * (1 / 3.0)
+
+    # Bishop
+    bishops = active_pieces & board.bishops
+    bishops_value = bin(bishops).count('1') * (1 / 3.0)
+
+    # Rook
+    rooks = active_pieces & board.rooks
+    rooks_value = bin(rooks).count('1') * (1 / 5.0)
+
+    # Queen
+    queens = active_pieces & board.queens
+    queens_value = bin(queens).count('1') * (1 / 9.0)
+
+    position_value += pawns_value + knights_value + \
+        rooks_value + queens_value + bishops_value
+
+    return position_value
