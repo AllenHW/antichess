@@ -19,28 +19,24 @@ class AntichessBoard(chess.Board):
         if self.is_capture(move):
             return True
         else:
-            return not any(self.generate_legal_captures())
+            return not any(self.generate_pseudo_legal_captures())
 
     def generate_evasions(self, from_mask=chess.BB_ALL, to_mask=chess.BB_ALL):
-        found_capture = False
-        for move in super(AntichessBoard, self).generate_evasions(from_mask, to_mask):
-            if self.is_capture(move):
-                yield move
-                found_capture = True
-
-        if not found_capture:
+        if any(self.generate_pseudo_legal_captures()):
+            for move in super(AntichessBoard, self).generate_evasions(from_mask, to_mask):
+                if self.is_capture(move):
+                    yield move
+        else:
             not_them = to_mask & ~self.occupied_co[not self.turn]
             for move in super(AntichessBoard, self).generate_evasions(from_mask, not_them):
                 yield move
 
     def generate_non_evasions(self, from_mask=chess.BB_ALL, to_mask=chess.BB_ALL):
-        found_capture = False
-        for move in super(AntichessBoard, self).generate_non_evasions(from_mask, to_mask):
-            if self.is_capture(move):
-                yield move
-                found_capture = True
-
-        if not found_capture:
+        if any(self.generate_pseudo_legal_captures()):
+            for move in super(AntichessBoard, self).generate_non_evasions(from_mask, to_mask):
+                if self.is_capture(move):
+                    yield move
+        else:
             not_them = to_mask & ~self.occupied_co[not self.turn]
             for move in super(AntichessBoard, self).generate_non_evasions(from_mask, not_them):
                 yield move
