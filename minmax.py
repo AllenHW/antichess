@@ -51,6 +51,15 @@ class AlphaBeta:
 
 def evaluate_board(board):
     position_value = 0
+    in_check = False
+
+    if board.is_check():
+        in_check = True
+        position_value -= 5
+
+    # If is checkmate
+    if in_check and board.is_checkmate():
+        return float('-inf')
 
     # Basic inverse piece valuation
     active_pieces = board.occupied_co[board.turn]
