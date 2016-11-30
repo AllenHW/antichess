@@ -1,3 +1,5 @@
+from python_chess import chess
+
 class AlphaBeta:
     def __init__(self, depth, board):
         self.depth = depth
@@ -11,8 +13,11 @@ class AlphaBeta:
             child_board = board.copy()
             child_board.push(move)
             utility = self.min_alpha_beta(child_board, 0, float('-inf'), float('inf'))
-            if best_move[1] <= utility:
+            if utility > best_move[1]:
                 best_move = (move, utility)
+
+        if not best_move[0]:
+            return list(board.legal_moves)[0]
 
         return best_move[0]
 
@@ -55,11 +60,11 @@ def evaluate_board(board):
 
     if board.is_check():
         in_check = True
-        position_value -= 5
+        position_value -= 50
 
     # If is checkmate
     if in_check and board.is_checkmate():
-        return float('-inf')
+        return -1000 # float('-inf')
 
     # Basic inverse piece valuation
     active_pieces = board.occupied_co[board.turn]
@@ -70,21 +75,37 @@ def evaluate_board(board):
 
     # Knight
     knights = active_pieces & board.knights
-    knights_value = bin(knights).count('1') * (1 / 3.0)
+    knights_value = bin(knights).count('1') * 3#(1 / 3.0)
 
     # Bishop
     bishops = active_pieces & board.bishops
-    bishops_value = bin(bishops).count('1') * (1 / 3.0)
+    bishops_value = bin(bishops).count('1') * 3 #(1 / 3.0)
 
     # Rook
     rooks = active_pieces & board.rooks
-    rooks_value = bin(rooks).count('1') * (1 / 5.0)
+    rooks_value = bin(rooks).count('1') * 5#(1 / 5.0)
 
     # Queen
     queens = active_pieces & board.queens
-    queens_value = bin(queens).count('1') * (1 / 9.0)
+    queens_value = bin(queens).count('1') * 9#(1 / 9.0)
 
     position_value += pawns_value + knights_value + \
         rooks_value + queens_value + bishops_value
+
+    # TODO: Add center control/Advancement value
+    rank_multi = 1
+    for rank in xrange(0, 8):
+        # White
+        if board.turn:
+            processed_rank = rank + 1
+        else:
+            processed_rank = 7 - rank + 1
+
+        rank_bin = bin(active_pieces & chess.BB_RANKS[rank])
+        position_value += rank_bin.count('1') * processed_rank * rank_multi
+
+    # Mobility
+    mobility_value = len(board.pseudo_legal_moves)
+    position_value += 0.8 * mobility_value
 
     return position_value
