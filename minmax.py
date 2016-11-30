@@ -52,7 +52,7 @@ class AlphaBeta:
 
         return value
 
-    # Iterative alphabeta
+    # Single method alphabeta
     def alphabeta(self, board, depth, alpha, beta, maximizingPlayer):
         if depth == 0:
             return evaluate_board(board)
