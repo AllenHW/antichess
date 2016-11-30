@@ -4,13 +4,14 @@ import minmax
 
 import random
 import sys
+from time import time
 
 
 def make_random_move(board):
     moves = list(board.legal_moves)
 
     if moves:
-        move_index = random.randint(0, len(moves)-1)
+        move_index = random.randint(0, len(moves) - 1)
         return str(moves[move_index])
 
     return None
@@ -19,6 +20,7 @@ def make_random_move(board):
 def print_legal_moves(board):
     for move in board.legal_moves:
         print move
+
 
 if __name__ == "__main__":
     args = sys.argv
@@ -50,18 +52,29 @@ if __name__ == "__main__":
     # TODO: Initialize our antichess variant
     board = antichess_board.AntichessBoard()
 
+    print "Starting Board:"
+    print board
     # Input loop
     while not board.is_game_over():
-        print board
+        print "Val: %f" % minmax.evaluate(board)
+
+        if board.turn:
+            print "Player: %s" % "White"
+        else:
+            print "Player: %s" % "Black"
+
         if is_white == board.turn:
             # It's our turn
-            print "Our Turn!"
 
             while True:
-                #move = raw_input("Our Move: ")
+                # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
-                ab = minmax.AlphaBeta(3, board)
+                start = time()
+                ab = minmax.AlphaBeta(4, board)
                 move = str(ab.get_best_move(board))
+                end = time()
+
+                print "Time Taken: %d" % (end-start)
 
                 try:
                     m = board.push_uci(move)
@@ -75,22 +88,31 @@ if __name__ == "__main__":
             # Not our turn wait for their input
             while True:
                 # enemy_move = raw_input("Move: ")
-                # enemy_move = make_random_move(board)
-                ab = minmax.AlphaBeta(3, board)
-                enemy_move = str(ab.get_best_move(board))
-                print enemy_move
+
+                rand_move = random.randint(1, 3)
+
+                if rand_move == 1:
+                    enemy_move = make_random_move(board)
+                else:
+                    ab = minmax.AlphaBeta(2, board)
+                    enemy_move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(enemy_move)
                     print "MOVED: %s" % m
                     break
                 except ValueError:
-                    print ("Illegal Move: %s" % move)
+                    print ("Illegal Move: %s" % enemy_move)
                     print_legal_moves(board)
                     continue
 
+        print board
         print("")
 
     print("Final Board:")
     print(board)
     print("GAME OVER!")
+    print(board.result())
+    print(board.legal_moves)
+
+    print(minmax.evaluate(board))
