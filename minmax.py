@@ -5,18 +5,19 @@ class AlphaBeta:
         self.depth = depth
         self.board = board
 
-
     def get_best_move(self, board):
-        best_move = (None, float('-inf'))
+        best_move = (None, float('inf'))
 
+        # Find a move the minimizes the utility of the opponent
         for move in board.legal_moves:
             child_board = board.copy()
             child_board.push(move)
             utility = self.min_alpha_beta(child_board, 0, float('-inf'), float('inf'))
-            if utility > best_move[1]:
+            if utility < best_move[1]:
                 best_move = (move, utility)
 
         if not best_move[0]:
+            print "no best move"
             return list(board.legal_moves)[0]
 
         return best_move[0]
@@ -60,7 +61,7 @@ def evaluate_board(board):
 
     if board.is_check():
         in_check = True
-        position_value -= 50
+        position_value -= 500
 
     # If is checkmate
     if in_check and board.is_checkmate():
@@ -93,7 +94,7 @@ def evaluate_board(board):
         rooks_value + queens_value + bishops_value
 
     # TODO: Add center control/Advancement value
-    rank_multi = 1
+    rank_multi = 2
     for rank in xrange(0, 8):
         # White
         if board.turn:
