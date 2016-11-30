@@ -6,14 +6,13 @@ class AlphaBeta:
         self.board = board
 
     def get_best_move(self, board):
-        best_move = (None, float('inf'))
+        best_move = (None, float('-inf'))
 
-        # Find a move the minimizes the utility of the opponent
         for move in board.legal_moves:
             child_board = board.copy()
             child_board.push(move)
-            utility = self.min_alpha_beta(child_board, 0, float('-inf'), float('inf'))
-            if utility < best_move[1]:
+            utility = self.min_alpha_beta(child_board, 1, float('-inf'), float('inf'))
+            if utility >= best_move[1]:
                 best_move = (move, utility)
 
         if not best_move[0]:
@@ -39,7 +38,6 @@ class AlphaBeta:
 
         return value
 
-
     def min_alpha_beta(self, board, curr_depth, alpha, beta):
         if curr_depth == self.depth:
             return evaluate_board(board)
@@ -53,6 +51,44 @@ class AlphaBeta:
                 break
 
         return value
+
+    # Iterative alphabeta
+    def alphabeta(self, board, depth, alpha, beta, maximizingPlayer):
+        if depth == 0:
+            return evaluate_board(board)
+
+        if maximizingPlayer:
+            move_made = False
+            v = float('-inf')
+            for move in board.legal_moves:
+                move_made = True
+                child_board = board.copy()
+                child_board.push(move)
+                v = max(v, self.alphabeta(child_board, depth - 1, alpha, beta, False))
+                alpha = max(alpha, v)
+                if beta <= alpha:
+                    break
+
+            if move_made:
+                return v
+            else:
+                return evaluate_board(board)
+        else:
+            move_made = False
+            v = float('inf')
+            for move in board.legal_moves:
+                move_made = True
+                child_board = board.copy()
+                child_board.push(move)
+                v = min(v, self.alphabeta(child_board, depth - 1, alpha, beta, True))
+                beta = min(beta, v)
+                if beta <= alpha:
+                    break
+
+            if move_made:
+                return v
+            else:
+                return evaluate_board(board)
 
 
 def evaluate_board(board):
