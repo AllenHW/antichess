@@ -1,6 +1,7 @@
 from python_chess import chess
 from python_chess.chess import pop_count
 
+
 class AlphaBeta:
     def __init__(self, depth, board):
         self.depth = depth
@@ -96,8 +97,9 @@ def evaluate(board):
     total_value = 0
     material_value = evaluate_material(board)
     mobility_value = evaluate_mobility_advantage(board)
+    piece_table_value = evaluate_piece_tables(board)
 
-    total_value += material_value + mobility_value
+    total_value += material_value + mobility_value + piece_table_value
 
     return total_value
 
@@ -202,68 +204,236 @@ def _evaluate_mobility_by_side(board, try_pseudo_capture_first=False):
 
     return mobility_value
 
-# def evaluate_board(board):
-#     position_value = 0
-#     in_check = False
 
-#     if board.is_check():
-#         in_check = True
-#         position_value -= 100
+# WHITE SIDE
+# pawn piece table
+PAWN_TABLE_W = [
+     0,  0,  0,  0,  0,  0,  0,  0,
+    50, 50, 50, 50, 50, 50, 50, 50,
+    10, 10, 20, 30, 30, 20, 10, 10,
+     5,  5, 10, 25, 25, 10,  5,  5,
+     0,  0,  0, 20, 20,  0,  0,  0,
+     5, -5,-10,  0,  0,-10, -5,  5,
+     5, 10, 10,-20,-20, 10, 10,  5,
+     0,  0,  0,  0,  0,  0,  0,  0]
 
-#     # If is checkmate
-#     if in_check and board.is_checkmate():
-#         return -10000
+KNIGHT_TABLE_W = [
+    -50,-40,-30,-30,-30,-30,-40,-50,
+    -40,-20,  0,  0,  0,  0,-20,-40,
+    -30,  0, 10, 15, 15, 10,  0,-30,
+    -30,  5, 15, 20, 20, 15,  5,-30,
+    -30,  0, 15, 20, 20, 15,  0,-30,
+    -30,  5, 10, 15, 15, 10,  5,-30,
+    -40,-20,  0,  5,  5,  0,-20,-40,
+    -50,-40,-30,-30,-30,-30,-40,-50]
 
-#     our_pieces = board.occupied_co[board.turn]
-#     their_pieces = board.occupied_co[not board.turn]
+BISHOP_TABLE_W = [
+    -20,-10,-10,-10,-10,-10,-10,-20,
+    -10,  0,  0,  0,  0,  0,  0,-10,
+    -10,  0,  5, 10, 10,  5,  0,-10,
+    -10,  5,  5, 10, 10,  5,  5,-10,
+    -10,  0, 10, 10, 10, 10,  0,-10,
+    -10, 10, 10, 10, 10, 10, 10,-10,
+    -10,  5,  0,  0,  0,  0,  5,-10,
+    -20,-10,-10,-10,-10,-10,-10,-20]
 
-#     # Material Score
-#     # Pawns
-#     pawns = our_pieces & board.pawns
-#     pawns_value = bin(pawns).count('1')
+ROOKS_TABLE_W = [
+    0,  0,  0,  0,  0,  0,  0,  0,
+    5, 10, 10, 10, 10, 10, 10,  5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    0,  0,  0,  5,  5,  0,  0,  0]
 
-#     # Knight
-#     knights = our_pieces & board.knights
-#     knights_value = bin(knights).count('1') * 3
+QUEEN_TABLE_W = [
+    -20,-10,-10, -5, -5,-10,-10,-20,
+    -10,  0,  0,  0,  0,  0,  0,-10,
+    -10,  0,  5,  5,  5,  5,  0,-10,
+     -5,  0,  5,  5,  5,  5,  0, -5,
+      0,  0,  5,  5,  5,  5,  0, -5,
+    -10,  5,  5,  5,  5,  5,  0,-10,
+    -10,  0,  5,  0,  0,  0,  0,-10,
+    -20,-10,-10, -5, -5,-10,-10,-20]
 
-#     # Bishop
-#     bishops = our_pieces & board.bishops
-#     bishops_value = bin(bishops).count('1') * 3
+KING_TABLE_W_MIDDLE = [
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -20,-30,-30,-40,-40,-30,-30,-20,
+    -10,-20,-20,-20,-20,-20,-20,-10,
+     20, 20,  0,  0,  0,  0, 20, 20,
+     20, 30, 10,  0,  0, 10, 30, 20]
 
-#     # Rook
-#     rooks = our_pieces & board.rooks
-#     rooks_value = bin(rooks).count('1') * 5
+KING_TABLE_W_END = [
+    -50,-40,-30,-20,-20,-30,-40,-50,
+    -30,-20,-10,  0,  0,-10,-20,-30,
+    -30,-10, 20, 30, 30, 20,-10,-30,
+    -30,-10, 30, 40, 40, 30,-10,-30,
+    -30,-10, 30, 40, 40, 30,-10,-30,
+    -30,-10, 20, 30, 30, 20,-10,-30,
+    -30,-30,  0,  0,  0,  0,-30,-30,
+    -50,-30,-30,-30,-30,-30,-30,-50]
 
-#     # Queen
-#     queens = our_pieces & board.queens
-#     queens_value = bin(queens).count('1') * 9
+# BLACK SIDE
+PAWN_TABLE_B = [
+     0,  0,  0,  0,  0,  0,  0,  0,
+     5, 10, 10,-20,-20, 10, 10,  5,
+     5, -5,-10,  0,  0,-10, -5,  5,
+     0,  0,  0, 20, 20,  0,  0,  0,
+     5,  5, 10, 25, 25, 10,  5,  5,
+    10, 10, 20, 30, 30, 20, 10, 10,
+    50, 50, 50, 50, 50, 50, 50, 50,
+     0,  0,  0,  0,  0,  0,  0,  0]
 
-#     position_value += pawns_value + knights_value + \
-#         rooks_value + queens_value + bishops_value
+KNIGHT_TABLE_B = [
+    -50,-40,-30,-30,-30,-30,-40,-50,
+    -40,-20,  0,  5,  5,  0,-20,-40,
+    -30,  5, 10, 15, 15, 10,  5,-30,
+    -30,  0, 15, 20, 20, 15,  0,-30,
+    -30,  5, 15, 20, 20, 15,  5,-30,
+    -30,  0, 10, 15, 15, 10,  0,-30,
+    -40,-20,  0,  0,  0,  0,-20,-40,
+    -50,-40,-30,-30,-30,-30,-40,-50]
 
-#     # TODO: Add center control/Advancement value
-#     rank_multi = 2
-#     for rank in xrange(0, 8):
-#         # White
-#         if board.turn:
-#             processed_rank = rank + 1
-#         else:
-#             processed_rank = 7 - rank + 1
+BISHOP_TABLE_B = [
+    -20,-10,-10,-10,-10,-10,-10,-20,
+    -10,  5,  0,  0,  0,  0,  5,-10,
+    -10, 10, 10, 10, 10, 10, 10,-10,
+    -10,  0, 10, 10, 10, 10,  0,-10,
+    -10,  5,  5, 10, 10,  5,  5,-10,
+    -10,  0,  5, 10, 10,  5,  0,-10,
+    -10,  0,  0,  0,  0,  0,  0,-10,
+    -20,-10,-10,-10,-10,-10,-10,-20]
 
-#         rank_bin = bin(our_pieces & chess.BB_RANKS[rank])
-#         position_value += rank_bin.count('1') * processed_rank * rank_multi
+ROOKS_TABLE_B = [
+    0,  0,  0,  5,  5,  0,  0,  0,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    -5,  0,  0,  0,  0,  0,  0, -5,
+    5, 10, 10, 10, 10, 10, 10,  5,
+    0,  0,  0,  0,  0,  0,  0,  0]
 
-#     # Mobility
-#     pseudo_legal_counter = 0
-#     capture_counter = 0
+QUEEN_TABLE_B = [
+    -20,-10,-10, -5, -5,-10,-10,-20,
+    -10,  0,  5,  0,  0,  0,  0,-10,
+    -10,  5,  5,  5,  5,  5,  0,-10,
+      0,  0,  5,  5,  5,  5,  0, -5,
+     -5,  0,  5,  5,  5,  5,  0, -5,
+    -10,  0,  5,  5,  5,  5,  0,-10,
+    -10,  0,  0,  0,  0,  0,  0,-10,
+    -20,-10,-10, -5, -5,-10,-10,-20]
 
-#     for move in board.pseudo_legal_moves:
-#         pseudo_legal_counter += 1
+KING_TABLE_B_MIDDLE = [
+     20, 30, 10,  0,  0, 10, 30, 20,
+     20, 20,  0,  0,  0,  0, 20, 20,
+    -10,-20,-20,-20,-20,-20,-20,-10,
+    -20,-30,-30,-40,-40,-30,-30,-20,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30]
 
-#         if board.is_capture(move):
-#             capture_counter += 1
+KING_TABLE_B_END = [
+    -50,-30,-30,-30,-30,-30,-30,-50,
+    -30,-30,  0,  0,  0,  0,-30,-30,
+    -30,-10, 20, 30, 30, 20,-10,-30,
+    -30,-10, 30, 40, 40, 30,-10,-30,
+    -30,-10, 30, 40, 40, 30,-10,-30,
+    -30,-10, 20, 30, 30, 20,-10,-30,
+    -30,-20,-10,  0,  0,-10,-20,-30,
+    -50,-40,-30,-20,-20,-30,-40,-50]
 
-#     mobility_value = pseudo_legal_counter if capture_counter == 0 else capture_counter
-#     position_value += 0.8 * mobility_value
+def evaluate_piece_tables(board):
+    WEIGHT = 0.2
+    turn = board.turn
 
-#     return position_value
+    white_value = _evaluate_white_piece_tables(board)
+    black_value = _evaluate_black_piece_tables(board)
+
+    if turn:
+        return (white_value - black_value) * WEIGHT
+    else:
+        return (black_value - white_value) * WEIGHT
+
+
+def _evaluate_white_piece_tables(board):
+    value = 0
+    # SquareSet of pawns
+    pawns = board.pieces(chess.PAWN, chess.WHITE)
+    knights = board.pieces(chess.KNIGHT, chess.WHITE)
+    bishops = board.pieces(chess.BISHOP, chess.WHITE)
+    rooks = board.pieces(chess.ROOK, chess.WHITE)
+    queens = board.pieces(chess.QUEEN, chess.WHITE)
+    kings = board.pieces(chess.KING, chess.WHITE)
+
+    # Pawns
+    for p in pawns:
+        value += PAWN_TABLE_W[63 - p]
+
+    # Knights
+    for k in knights:
+        value += KNIGHT_TABLE_W[63 - k]
+
+    # Bishops
+    for b in bishops:
+        value += BISHOP_TABLE_W[63 - b]
+
+    # Rooks
+    for r in rooks:
+        value += ROOKS_TABLE_W[63 - r]
+
+    # Queen
+    for q in queens:
+        value += QUEEN_TABLE_W[63 - q]
+
+    # King
+    king_table = KING_TABLE_W_MIDDLE
+    # TODO ADD ENDGAME TABLE
+    for king in kings:
+        value += king_table[63 - king]
+
+    return value
+
+
+def _evaluate_black_piece_tables(board):
+    value = 0
+    # SquareSet of pawns
+    pawns = board.pieces(chess.PAWN, chess.BLACK)
+    knights = board.pieces(chess.KNIGHT, chess.BLACK)
+    bishops = board.pieces(chess.BISHOP, chess.BLACK)
+    rooks = board.pieces(chess.ROOK, chess.BLACK)
+    queens = board.pieces(chess.QUEEN, chess.BLACK)
+    kings = board.pieces(chess.KING, chess.BLACK)
+
+    # Pawns
+    for p in pawns:
+        value += PAWN_TABLE_B[63 - p]
+
+    # Knights
+    for k in knights:
+        value += KNIGHT_TABLE_B[63 - k]
+
+    # Bishops
+    for b in bishops:
+        value += BISHOP_TABLE_B[63 - b]
+
+    # Rooks
+    for r in rooks:
+        value += ROOKS_TABLE_B[63 - r]
+
+    # Queen
+    for q in queens:
+        value += QUEEN_TABLE_B[63 - q]
+
+    # King
+    king_table = KING_TABLE_B_MIDDLE
+    # TODO ADD ENDGAME TABLE
+    for king in kings:
+        value += king_table[63 - king]
+
+    return value
