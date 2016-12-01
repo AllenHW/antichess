@@ -41,28 +41,32 @@ class AlphaBeta:
             return evaluate(board)
 
         value = alpha
+        move_found = False
         for move in board.legal_moves:
+            move_found = True
             child_board = board.copy()
             child_board.push(move)
             value = max(value, self.min_alpha_beta(child_board, curr_depth+1, value, beta))
             if value >= beta:
                 break
 
-        return value
+        return value if move_found else float('-inf')
 
     def min_alpha_beta(self, board, curr_depth, alpha, beta):
         if curr_depth >= self.depth:
             return -evaluate(board)
 
         value = beta
+        move_found = False
         for move in board.legal_moves:
+            move_found = True
             child_board = board.copy()
             child_board.push(move)
             value = min(value, self.max_alpha_beta(child_board, curr_depth+1, alpha, value))
             if value <= alpha:
                 break
 
-        return value
+        return value if move_found else float('inf')
 
     # Single method alphabeta
     # def alphabeta(self, board, depth, alpha, beta, maximizingPlayer):
