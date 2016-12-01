@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
                 start = time()
-                ab = minmax.AlphaBeta(4, board)
+                ab = minmax.AlphaBeta(5, board)
                 move = str(ab.get_best_move(board))
                 end = time()
 

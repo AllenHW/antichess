@@ -1,26 +1,36 @@
 from python_chess import chess
 from python_chess.chess import pop_count
+from multiprocessing import Pool
+import operator
+import multiprocessing
+
+def unwrap_self_f(arg, **kwarg):
+    return AlphaBeta._get_move_utility(*arg, **kwarg)
 
 class AlphaBeta:
     def __init__(self, depth, board):
         self.depth = depth
         self.board = board
 
-    def get_best_move(self, board):
-        best_move = (None, float('-inf'))
 
-        for move in board.legal_moves:
+    def _get_move_utility(self, board):
+        return self.min_alpha_beta(board, 1, float('-inf'), float('inf'))
+
+    def get_best_move(self, board):
+        legal_moves = list(board.legal_moves)
+
+        child_boards = []
+        for move in legal_moves:
             child_board = board.copy()
             child_board.push(move)
-            utility = self.min_alpha_beta(child_board, 1, float('-inf'), float('inf'))
-            if utility >= best_move[1]:
-                best_move = (move, utility)
+            child_boards.append(child_board)
 
-        if not best_move[0]:
-            print "no best move"
-            return list(board.legal_moves)[0]
+        pool = Pool(processes=4)
+        utilities = pool.map(unwrap_self_f, zip([self]*len(child_boards), child_boards))
+        index, value = max(enumerate(utilities), key=operator.itemgetter(1))
 
-        return best_move[0]
+        pool.terminate()
+        return legal_moves[index]
 
     def min_max(self):
         return self.max_alpha_beta(self.board, 0, float('-inf'), float('inf'))
