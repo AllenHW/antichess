@@ -19,27 +19,33 @@ class AntichessBoard(chess.Board):
         if self.is_capture(move):
             return True
         else:
-            return not any(self.generate_pseudo_legal_captures())
+            return not any(self.generate_legal_captures())
 
     def generate_evasions(self, from_mask=chess.BB_ALL, to_mask=chess.BB_ALL):
-        if any(self.generate_pseudo_legal_captures()):
-            for move in super(AntichessBoard, self).generate_evasions(from_mask, to_mask):
-                if self.is_capture(move):
-                    yield move
+        all_evasions = []
+        capture_evasions = []
+        for move in super(AntichessBoard, self).generate_evasions(from_mask, to_mask):
+            if self.is_capture(move):
+                capture_evasions.append(move)
+            all_evasions.append(move)
+
+        if capture_evasions:
+            return iter(capture_evasions)
         else:
-            not_them = to_mask & ~self.occupied_co[not self.turn]
-            for move in super(AntichessBoard, self).generate_evasions(from_mask, not_them):
-                yield move
+            return iter(all_evasions)
 
     def generate_non_evasions(self, from_mask=chess.BB_ALL, to_mask=chess.BB_ALL):
-        if any(self.generate_pseudo_legal_captures()):
-            for move in super(AntichessBoard, self).generate_non_evasions(from_mask, to_mask):
-                if self.is_capture(move):
-                    yield move
+        all_non_evasions = []
+        capture_non_evasions = []
+        for move in super(AntichessBoard, self).generate_non_evasions(from_mask, to_mask):
+            if self.is_capture(move):
+                capture_non_evasions.append(move)
+            all_non_evasions.append(move)
+
+        if capture_non_evasions:
+            return iter(capture_non_evasions)
         else:
-            not_them = to_mask & ~self.occupied_co[not self.turn]
-            for move in super(AntichessBoard, self).generate_non_evasions(from_mask, not_them):
-                yield move
+            return iter(all_non_evasions)
 
 
     def __str__(self):
