@@ -47,6 +47,8 @@ if __name__ == "__main__":
 
     # Player colour
     is_white = (colour == 'w' or colour == 'white')
+    first_move = True
+    DEFAULT_FIRST_MOVE = "b1c3"
 
     # Initialize the board
     # TODO: Initialize our antichess variant
@@ -70,8 +72,12 @@ if __name__ == "__main__":
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
                 start = time()
-                ab = minmax.AlphaBeta(5, board)
-                move = str(ab.get_best_move(board))
+                if first_move and is_white:
+                    move = DEFAULT_FIRST_MOVE
+                    first_move = False
+                else:
+                    ab = minmax.AlphaBeta(5, board)
+                    move = str(ab.get_best_move(board))
                 end = time()
 
                 print "Time Taken: %d" % (end-start)
