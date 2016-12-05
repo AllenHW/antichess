@@ -83,9 +83,12 @@ class AlphaBeta:
 
 def evaluate(board):
     total_value = 0
-    material_value = evaluate_material(board)
+    material_value = 20*evaluate_material(board)
     mobility_value = evaluate_mobility_advantage(board)
-    piece_table_value = evaluate_piece_tables(board)
+    if is_end_game(board):
+        piece_table_value = evaluate_piece_tables(board, 0.5)
+    else:
+        piece_table_value = 0
 
     total_value += material_value + mobility_value + piece_table_value
 
@@ -112,6 +115,10 @@ def evaluate_material(board):
     # Modified Multipliers
     t_ratio = (16.0 - t_piece_count) / 16.0
     o_ratio = (16.0 - o_piece_count) / 16.0
+
+    pawn_o_multi = 1.2 if t_ratio < 0.5 else BASE_PAWN_VALUE
+    pawn_t_multi = 1.2 if o_ratio < 0.5 else BASE_PAWN_VALUE
+
     # Knight
     knight_o_multi = max(3.0, t_ratio * BASE_KNIGHT_VALUE)
     knight_t_multi = max(3.0, o_ratio * BASE_KNIGHT_VALUE)
@@ -135,7 +142,7 @@ def evaluate_material(board):
     # Pawns
     o_pawns = pop_count(our_pieces & board.pawns)
     t_pawns = pop_count(their_pieces & board.pawns)
-    pawn_value = (o_pawns - t_pawns) * BASE_PAWN_VALUE
+    pawn_value = pawn_o_multi * o_pawns - pawn_t_multi * t_pawns
 
     # Knight
     o_knights = pop_count(our_pieces & board.knights)
@@ -337,17 +344,16 @@ KING_TABLE_B_END = [
     -30,-20,-10,  0,  0,-10,-20,-30,
     -50,-40,-30,-20,-20,-30,-40,-50]
 
-def evaluate_piece_tables(board):
-    WEIGHT = 0.25
+def evaluate_piece_tables(board, weight):
     turn = board.turn
 
     white_value = _evaluate_white_piece_tables(board)
     black_value = _evaluate_black_piece_tables(board)
 
     if turn:
-        return (white_value - black_value) * WEIGHT
+        return (white_value - black_value) * weight
     else:
-        return (black_value - white_value) * WEIGHT
+        return (black_value - white_value) * weight
 
 
 def is_end_game(board):

@@ -101,12 +101,13 @@ if __name__ == "__main__":
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
                 else:
-                    ab = minmax.AlphaBeta(4, 1000, board)
+                    ab = minmax.AlphaBeta(3, 1000, board)
                     move = str(ab.get_best_move(board))
                 end = time()
 
                 print "Time Taken: %.10f" % (end - start)
                 try:
+                    print "value: %.10f" % (minmax.evaluate(board))
                     m = board.push_uci(move)
                     break
                 except ValueError:
