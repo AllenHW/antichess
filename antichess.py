@@ -94,7 +94,7 @@ if __name__ == "__main__":
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
                 start = time()
-                if endgame_type:
+                if endgame_type and endgame_type <= 2:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
                 elif first_move and is_white:
