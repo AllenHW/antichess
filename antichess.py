@@ -77,8 +77,7 @@ if __name__ == "__main__":
 
     # Initialize the board
     # board = antichess_board.AntichessBoard("4k3/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
-    board = antichess_board.AntichessBoard("8/8/8/8/8/8/6Q1/4k2K w - - 0 1")
-    print board
+    board = antichess_board.AntichessBoard()
 
     # Input loop
     while not board.is_game_over():
