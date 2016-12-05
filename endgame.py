@@ -309,7 +309,7 @@ class EndgameBase:
                 king_sq = list(child_board.pieces(chess.KING, not child_board.turn))[0]
                 enemy_king_sq = list(child_board.pieces(chess.KING, child_board.turn))[0]
                 
-                if not (child_board.is_checkmate() or child_board.is_check() or child_board.is_stalemate()):
+                if not (child_board.is_checkmate() or child_board.is_stalemate()):
                     d = self._distance(child_board, queen_sq, enemy_king_sq)
                     if (self._is_piece_protected_by_king(child_board, queen_sq, king_sq)) and (d < min_total_d):
                         best_move = move
