@@ -104,7 +104,6 @@ if __name__ == "__main__":
             # Not our turn wait for their input
             while True:
                 # enemy_move = raw_input("Move: ")
-
                 rand_move = random.randint(1, 3)
                 
                 if rand_move == 1:
