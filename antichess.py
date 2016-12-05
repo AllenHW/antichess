@@ -1,5 +1,6 @@
 from python_chess import chess
 import antichess_board
+import endgame
 import minmax
 
 import random
@@ -50,6 +51,9 @@ if __name__ == "__main__":
     first_move = True
     DEFAULT_FIRST_MOVE = "b1c3"
 
+    # Endgame
+    is_endgame = True
+
     # Initialize the board
     # TODO: Initialize our antichess variant
     board = antichess_board.AntichessBoard()
@@ -72,11 +76,17 @@ if __name__ == "__main__":
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
                 start = time()
-                if first_move and is_white:
+                if False and first_move and is_white:
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
+                elif is_endgame:
+                    eg = endgame.EndgameBase(board, 1)
+                    move = eg._get_move_endgame_1(board)
+                    print "MOVE: {0}".format(str(move))
+                    # move = "e4d4"
                 else:
-                    ab = minmax.AlphaBeta(5, board)
+                    # Change back to 5 later
+                    ab = minmax.AlphaBeta(1, board)
                     move = str(ab.get_best_move(board))
                 end = time()
 
@@ -96,7 +106,7 @@ if __name__ == "__main__":
                 # enemy_move = raw_input("Move: ")
 
                 rand_move = random.randint(1, 3)
-
+                
                 if rand_move == 1:
                     enemy_move = make_random_move(board)
                 else:
