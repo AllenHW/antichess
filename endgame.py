@@ -161,11 +161,7 @@ class EndgameBase:
         return move
 
     # ONE_ROOK_ENDGAME
-    def _get_move_endgame_1(self, board):
-        assert(len(board.pieces(chess.ROOK, board.turn)) == 1)
-        assert(len(board.pieces(chess.KING, board.turn)) == 1)
-        assert(len(board.pieces(chess.KING, not board.turn)) == 1)
-        
+    def _get_move_endgame_1(self, board):        
         rook_sq = list(board.pieces(chess.ROOK, board.turn))[0]
         king_sq = list(board.pieces(chess.KING, board.turn))[0]
         enemy_king_sq = list(board.pieces(chess.KING, not board.turn))[0]
@@ -200,7 +196,7 @@ class EndgameBase:
                 enemy_king_sq = list(child_board.pieces(chess.KING, child_board.turn))[0]
                 enemy_king_area = self._get_king_movement_area(child_board, rook_sq, enemy_king_sq)
                 child_is_rook_attacked = list(child_board.attackers(child_board.turn, rook_sq))
-                child_is_rook_protected = self._is_rook_protected(child_board, rook_sq, king_sq)
+                child_is_rook_protected = self._is_piece_protected_by_king(child_board, rook_sq, king_sq)
                 
                 if self._is_king_picking(child_board, rook_sq, king_sq, enemy_king_sq):
                     # Don't make this move as the king is picking the rook
@@ -245,11 +241,7 @@ class EndgameBase:
         return str(best_move)
 
     # ONE_QUEEN_ENDGAME
-    def _get_move_endgame_2(self, board):
-        assert(len(board.pieces(chess.QUEEN, board.turn)) == 1)
-        assert(len(board.pieces(chess.KING, board.turn)) == 1)
-        assert(len(board.pieces(chess.KING, not board.turn)) == 1)
-        
+    def _get_move_endgame_2(self, board):        
         queen_sq = list(board.pieces(chess.QUEEN, board.turn))[0]
         queen_sq_copy = queen_sq
         king_sq = list(board.pieces(chess.KING, board.turn))[0]
@@ -270,6 +262,7 @@ class EndgameBase:
             kings_same_quadrant = True
 
         for move in legal_moves:
+            print move
             child_board = board.copy()
             child_board.push(move)
             if (child_board.is_checkmate()):
@@ -297,7 +290,12 @@ class EndgameBase:
                     prev_best_move = best_move
                     best_move = move
 
+        print "prev best move {0}".format(prev_best_move)
+        print "best move {0}".format(best_move)
+        print "min_d {0}".format
+
         if not prev_best_move:
+            print "PROBLEM"
             min_total_d = float("inf")
             # Take good queen move that doesn't stalemate and doesn't check
             # This is to deal with cases like "8/8/8/8/8/5Q2/8/K1k5 w - - 0 1"
@@ -309,7 +307,7 @@ class EndgameBase:
                 king_sq = list(child_board.pieces(chess.KING, not child_board.turn))[0]
                 enemy_king_sq = list(child_board.pieces(chess.KING, child_board.turn))[0]
                 
-                if not (child_board.is_checkmate() or child_board.is_check() or child_board.is_stalemate()):
+                if not (child_board.is_checkmate() or child_board.is_stalemate()):
                     d = self._distance(child_board, queen_sq, enemy_king_sq)
                     if (self._is_piece_protected_by_king(child_board, queen_sq, king_sq)) and (d < min_total_d):
                         best_move = move
@@ -317,11 +315,7 @@ class EndgameBase:
 
         return str(best_move)
 
-    def _get_move_endgame_3(self, board):
-        assert(len(board.pieces(chess.ROOK, board.turn)) == 2)
-        assert(len(board.pieces(chess.KING, board.turn)) == 1)
-        assert(len(board.pieces(chess.KING, not board.turn)) == 1)
-        
+    def _get_move_endgame_3_and_4(self, board):        
         rook_sq = list(board.pieces(chess.ROOK, board.turn))[0]
         king_sq = list(board.pieces(chess.KING, board.turn))[0]
         enemy_king_sq = list(board.pieces(chess.KING, not board.turn))[0]
@@ -329,11 +323,6 @@ class EndgameBase:
         is_rook_attacked = list(board.attackers(not board.turn, rook_sq))
         is_rook_protected = self._is_piece_protected_by_king(board, rook_sq, king_sq)
         min_enemy_king_area = self._get_king_movement_area(board, rook_sq, enemy_king_sq)
-        
-        if min_enemy_king_area == 2:
-            best_move = self._get_finish_move_endgame_1(board, rook_sq, king_sq, enemy_king_sq)
-            if best_move:
-                return str(best_move)
         
         legal_moves = list(board.legal_moves)
         child_boards = []
@@ -357,13 +346,9 @@ class EndgameBase:
                 enemy_king_sq = list(child_board.pieces(chess.KING, child_board.turn))[0]
                 enemy_king_area = self._get_king_movement_area(child_board, rook_sq, enemy_king_sq)
                 child_is_rook_attacked = list(child_board.attackers(child_board.turn, rook_sq))
-                child_is_rook_protected = self._is_rook_protected(child_board, rook_sq, king_sq)
+                child_is_rook_protected = self._is_piece_protected_by_king(child_board, rook_sq, king_sq)
                 
-                # if self._is_king_picking(child_board, rook_sq, king_sq, enemy_king_sq):
-                #     # Don't make this move as the king is picking the rook
-                #     continue
                 if child_is_rook_attacked and not child_is_rook_protected:
-                    # Don't make this move as it leaves our rook unprotected and attacked
                     # Make this move to simplify to ONE_ROOK_ENDGAME
                     best_move = move
                     break
@@ -377,15 +362,86 @@ class EndgameBase:
                     min_total_d = d
                     prev_best_move = best_move
                     best_move = move
-                    
+        
+        return str(best_move)
+
+    # def _get_move_endgame_4(self, board):
+    #     assert(len(board.pieces(chess.ROOK, board.turn)) == 1)
+    #     assert(len(board.pieces(chess.QUEEN, board.turn)) == 1)
+    #     assert(len(board.pieces(chess.KING, board.turn)) == 1)
+    #     assert(len(board.pieces(chess.KING, not board.turn)) == 1)
+        
+    #     rook_sq = list(board.pieces(chess.ROOK, board.turn))[0]
+    #     king_sq = list(board.pieces(chess.KING, board.turn))[0]
+    #     enemy_king_sq = list(board.pieces(chess.KING, not board.turn))[0]
+        
+    #     is_rook_attacked = list(board.attackers(not board.turn, rook_sq))
+    #     is_rook_protected = self._is_piece_protected_by_king(board, rook_sq, king_sq)
+    #     min_enemy_king_area = self._get_king_movement_area(board, rook_sq, enemy_king_sq)
+        
+    #     legal_moves = list(board.legal_moves)
+    #     child_boards = []
+
+    #     min_total_d = float("inf")
+    #     prev_best_move = legal_moves[0]
+    #     best_move = legal_moves[0]
+
+    #     for move in legal_moves:
+    #         child_board = board.copy()
+    #         child_board.push(move)
+    #         if (child_board.is_checkmate()):
+    #             # Make this move as it will checkmate
+    #             best_move = move
+    #             break
+    #         elif (child_board.is_check() or child_board.is_stalemate()):
+    #             continue
+    #         else:
+    #             rook_sq = list(child_board.pieces(chess.ROOK, not child_board.turn))[0]
+    #             king_sq = list(child_board.pieces(chess.KING, not child_board.turn))[0]
+    #             enemy_king_sq = list(child_board.pieces(chess.KING, child_board.turn))[0]
+    #             enemy_king_area = self._get_king_movement_area(child_board, rook_sq, enemy_king_sq)
+    #             child_is_rook_attacked = list(child_board.attackers(child_board.turn, rook_sq))
+    #             child_is_rook_protected = self._is_piece_protected_by_king(child_board, rook_sq, king_sq)
+                
+    #             if child_is_rook_attacked and not child_is_rook_protected:
+    #                 # Make this move to simplify to ONE_QUEEN_ENDGAME
+    #                 best_move = move
+    #                 break
+            
+    #             d = self._distance(child_board, king_sq, rook_sq) + self._distance(child_board, rook_sq, enemy_king_sq) + self._distance(child_board, king_sq, enemy_king_sq)
+            
+    #             if  (d <= min_total_d) and (enemy_king_area <= min_enemy_king_area):
+    #                 if (enemy_king_area == min_enemy_king_area) and (d == min_total_d):
+    #                     if (random.random() < 0.5):
+    #                         continue
+    #                 min_total_d = d
+    #                 prev_best_move = best_move
+    #                 best_move = move
+        
+    #     return str(best_move)
 
     def get_best_move(self, board):
         if self.endgame_type == self.ONE_ROOK_ENDGAME:
+            assert(len(board.pieces(chess.ROOK, board.turn)) == 1)
+            assert(len(board.pieces(chess.KING, board.turn)) == 1)
+            assert(len(board.pieces(chess.KING, not board.turn)) == 1)
             return self._get_move_endgame_1(board)
         elif self.endgame_type == self.ONE_QUEEN_ENDGAME:
+            assert(len(board.pieces(chess.QUEEN, board.turn)) == 1)
+            assert(len(board.pieces(chess.KING, board.turn)) == 1)
+            assert(len(board.pieces(chess.KING, not board.turn)) == 1)
             return self._get_move_endgame_2(board)
         elif self.endgame_type == self.TWO_ROOKS_ENDGAME:
-            return self._get_move_endgame_3(board)
+            assert(len(board.pieces(chess.ROOK, board.turn)) == 2)
+            assert(len(board.pieces(chess.KING, board.turn)) == 1)
+            assert(len(board.pieces(chess.KING, not board.turn)) == 1)
+            return self._get_move_endgame_3_and_4(board)
+        elif self.endgame_type == self.ROOK_AND_QUEEN_ENDGAME:
+            assert(len(board.pieces(chess.ROOK, board.turn)) == 1)
+            assert(len(board.pieces(chess.QUEEN, board.turn)) == 1)
+            assert(len(board.pieces(chess.KING, board.turn)) == 1)
+            assert(len(board.pieces(chess.KING, not board.turn)) == 1)
+            return self._get_move_endgame_3_and_4(board)
 
         print "Endgame {0} called but not implemented yet, exiting".format(self.endgame_type)
         exit(0)

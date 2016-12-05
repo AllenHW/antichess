@@ -18,6 +18,7 @@ def make_random_move(board):
 
     return None
 
+
 def get_endgame_type(board):
     NOT_ENDGAME = 0
     ONE_ROOK_ENDGAME = 1        # Not implemented
@@ -76,17 +77,11 @@ if __name__ == "__main__":
 
     # Initialize the board
     # board = antichess_board.AntichessBoard("4k3/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
-    board = antichess_board.AntichessBoard("8/8/4R3/5R2/8/8/8/K1k5 w - - 0 1")
+    board = antichess_board.AntichessBoard("8/8/8/8/8/8/6Q1/4k2K w - - 0 1")
     print board
+
     # Input loop
     while not board.is_game_over():
-        # print "Val: %f" % minmax.evaluate(board)
-
-        # if board.turn:
-        #     print "Player: %s" % "White"
-        # else:
-        #     print "Player: %s" % "Black"
-
         if is_white == board.turn:
             # It's our turn
 
@@ -95,25 +90,23 @@ if __name__ == "__main__":
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
 
-                if endgame_type and endgame_type <= 3:
+                if endgame_type and endgame_type <= 4:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
                 elif first_move and is_white:
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
                 else:
-                    ab = minmax.AlphaBeta(1000, board)
+                    ab = minmax.AlphaBeta(4, 1000, board)
                     move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(move)
-                    print(m.uci())
                     break
                 except ValueError:
                     print ("Illegal Move: %s" % move)
                     print_legal_moves(board)
                     continue
-
         else:
             # Not our turn wait for their input
             while True:
@@ -138,10 +131,5 @@ if __name__ == "__main__":
         print board
         print("")
 
-    # print("Final Board:")
-    # print(board)
     print("GAME OVER!")
     print(board.result())
-    # print(board.legal_moves)
-
-    # print(minmax.evaluate(board))
