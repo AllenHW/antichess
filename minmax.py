@@ -1,7 +1,7 @@
 from python_chess import chess
 from python_chess.chess import pop_count
-# from quiescent_search import is_quiet_position
-# from quiescent_search import quiescent_search
+from quiescent_search import is_quiet_position
+from quiescent_search import quiescent_search
 from multiprocessing import Pool
 import operator
 import multiprocessing
@@ -37,8 +37,8 @@ class AlphaBeta:
     def min_max(self):
         return self.max_alpha_beta(self.board, 0, float('-inf'), float('inf'))
 
-    def max_alpha_beta(self, board, curr_depth, alpha, beta):
-        if curr_depth >= self.depth:
+    def max_alpha_beta(self, board, curr_factor, alpha, beta):
+        if curr_factor >= self.factor:
             if is_quiet_position(board):
                 return evaluate(board)
             else:
@@ -58,8 +58,8 @@ class AlphaBeta:
 
         return value if move_found else float('-inf')
 
-    def min_alpha_beta(self, board, curr_depth, alpha, beta):
-        if curr_depth >= self.depth:
+    def min_alpha_beta(self, board, curr_factor, alpha, beta):
+        if curr_factor >= self.factor:
             if is_quiet_position(board):
                 return -evaluate(board)
             else:
