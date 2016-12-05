@@ -76,8 +76,8 @@ if __name__ == "__main__":
 
     # Initialize the board
     # board = antichess_board.AntichessBoard("4k3/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
-    board = antichess_board.AntichessBoard()
-
+    board = antichess_board.AntichessBoard("8/8/4R3/5R2/8/8/8/K1k5 w - - 0 1")
+    print board
     # Input loop
     while not board.is_game_over():
         # print "Val: %f" % minmax.evaluate(board)
@@ -95,7 +95,7 @@ if __name__ == "__main__":
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
 
-                if endgame_type and endgame_type <= 2:
+                if endgame_type and endgame_type <= 3:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
                 elif first_move and is_white:
@@ -117,15 +117,15 @@ if __name__ == "__main__":
         else:
             # Not our turn wait for their input
             while True:
-                # enemy_move = raw_input("Move: ")
+                enemy_move = raw_input("Move: ")
 
-                rand_move = random.randint(1, 3)
+                # rand_move = random.randint(1, 3)
 
-                if rand_move == 1:
-                    enemy_move = make_random_move(board)
-                else:
-                    ab = minmax.AlphaBeta(100, board)
-                    enemy_move = str(ab.get_best_move(board))
+                # if rand_move == 1:
+                #     enemy_move = make_random_move(board)
+                # else:
+                #     ab = minmax.AlphaBeta(100, board)
+                #     enemy_move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(enemy_move)
