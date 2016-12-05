@@ -9,10 +9,9 @@ def unwrap_self_f(arg, **kwarg):
 
 
 class AlphaBeta:
-    def __init__(self, depth, board):
-        self.depth = depth
+    def __init__(self, factor, board):
+        self.factor = factor
         self.board = board
-
 
     def _get_move_utility(self, board):
         return self.min_alpha_beta(board, 1, float('-inf'), float('inf'))
@@ -36,34 +35,38 @@ class AlphaBeta:
     def min_max(self):
         return self.max_alpha_beta(self.board, 0, float('-inf'), float('inf'))
 
-    def max_alpha_beta(self, board, curr_depth, alpha, beta):
-        if curr_depth >= self.depth:
+    def max_alpha_beta(self, board, curr_factor, alpha, beta):
+        if curr_factor >= self.factor:
             return evaluate(board)
 
         value = alpha
         move_found = False
-        for move in board.legal_moves:
+        legal_moves = list(board.legal_moves)
+        legal_moves_len = len(legal_moves)
+        for i, move in enumerate(legal_moves):
             move_found = True
             child_board = board.copy()
             child_board.push(move)
-            value = max(value, self.min_alpha_beta(child_board, curr_depth+1, value, beta))
-            if value >= beta:
+            value = max(value, self.min_alpha_beta(child_board, curr_factor*legal_moves_len, value, beta))
+            if value >= beta or curr_factor*(i+1) >= self.factor:
                 break
 
         return value if move_found else float('-inf')
 
-    def min_alpha_beta(self, board, curr_depth, alpha, beta):
-        if curr_depth >= self.depth:
+    def min_alpha_beta(self, board, curr_factor, alpha, beta):
+        if curr_factor >= self.factor:
             return -evaluate(board)
 
         value = beta
         move_found = False
-        for move in board.legal_moves:
+        legal_moves = list(board.legal_moves)
+        legal_moves_len = len(legal_moves)
+        for i, move in enumerate(legal_moves):
             move_found = True
             child_board = board.copy()
             child_board.push(move)
-            value = min(value, self.max_alpha_beta(child_board, curr_depth+1, alpha, value))
-            if value <= alpha:
+            value = min(value, self.max_alpha_beta(child_board, curr_factor*legal_moves_len, alpha, value))
+            if value <= alpha or curr_factor*(i+1) >= self.factor:
                 break
 
         return value if move_found else float('inf')
@@ -81,7 +84,7 @@ def evaluate(board):
 
 def evaluate_material(board):
     # Base Multipliers
-    BASE_KING_VALUE = 200.0
+    BASE_KING_VALUE = 2000.0
     BASE_PAWN_VALUE = 1.0
     BASE_BISHOP_VALUE = 3.3
     BASE_KNIGHT_VALUE = 3.2
@@ -151,6 +154,7 @@ def evaluate_material(board):
 
 
 def evaluate_mobility_advantage(board, try_pseudo_capture_first=False):
+    return 0
     mover_mobility = _evaluate_mobility_by_side(board, try_pseudo_capture_first)
     board.push(chess.Move.null())
     waiter_mobility = _evaluate_mobility_by_side(board, try_pseudo_capture_first)
@@ -324,7 +328,7 @@ KING_TABLE_B_END = [
     -50,-40,-30,-20,-20,-30,-40,-50]
 
 def evaluate_piece_tables(board):
-    WEIGHT = 0.4
+    WEIGHT = 0.05
     turn = board.turn
 
     white_value = _evaluate_white_piece_tables(board)

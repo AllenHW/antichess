@@ -109,7 +109,7 @@ if __name__ == "__main__":
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
                 else:
-                    ab = minmax.AlphaBeta(5, board)
+                    ab = minmax.AlphaBeta(1000, board)
                     move = str(ab.get_best_move(board))
                 end = time()
 
@@ -126,15 +126,15 @@ if __name__ == "__main__":
         else:
             # Not our turn wait for their input
             while True:
-                enemy_move = raw_input("Move: ")
+                # enemy_move = raw_input("Move: ")
 
-                # rand_move = random.randint(1, 3)
+                rand_move = random.randint(1, 3)
 
-                # if rand_move == 1:
-                #     enemy_move = make_random_move(board)
-                # else:
-                #     ab = minmax.AlphaBeta(2, board)
-                #     enemy_move = str(ab.get_best_move(board))
+                if rand_move == 1:
+                    enemy_move = make_random_move(board)
+                else:
+                    ab = minmax.AlphaBeta(100, board)
+                    enemy_move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(enemy_move)
