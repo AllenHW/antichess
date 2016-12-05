@@ -202,5 +202,6 @@ class EndgameBase:
         if self.endgame_type == self.ONE_ROOK_ENDGAME:
             return self._get_move_endgame_1(board)
 
-        print "Endgame {0} not implemented yet, exiting".format(self.endgame_type)
-        exit(0)
+        return None
+        # print "Endgame {0} not implemented yet, exiting".format(self.endgame_type)
+        # exit(0)

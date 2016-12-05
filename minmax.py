@@ -37,13 +37,12 @@ class AlphaBeta:
     def min_max(self):
         return self.max_alpha_beta(self.board, 0, float('-inf'), float('inf'))
 
-    def max_alpha_beta(self, board, curr_factor, alpha, beta):
-        if curr_factor >= self.factor:
-            # if is_quiet_position(board):
-            #     return evaluate(board)
-            # else:
-            #     return quiescent_search(board, alpha, beta, evaluate)
-            return evaluate(board)
+    def max_alpha_beta(self, board, curr_depth, alpha, beta):
+        if curr_depth >= self.depth:
+            if is_quiet_position(board):
+                return evaluate(board)
+            else:
+                return quiescent_search(board, alpha, beta, evaluate)
 
         value = alpha
         move_found = False
@@ -59,13 +58,12 @@ class AlphaBeta:
 
         return value if move_found else float('-inf')
 
-    def min_alpha_beta(self, board, curr_factor, alpha, beta):
-        if curr_factor >= self.factor:
-            # if is_quiet_position(board):
-            #     return -evaluate(board)
-            # else:
-            #     return -quiescent_search(board, alpha, beta, evaluate)
-            return -evaluate(board)
+    def min_alpha_beta(self, board, curr_depth, alpha, beta):
+        if curr_depth >= self.depth:
+            if is_quiet_position(board):
+                return -evaluate(board)
+            else:
+                return -quiescent_search(board, alpha, beta, evaluate)
 
         value = beta
         move_found = False
@@ -351,6 +349,19 @@ def evaluate_piece_tables(board):
         return (black_value - white_value) * WEIGHT
 
 
+def is_end_game(board):
+    our_pieces = board.occupied_co[board.turn]
+    o_piece_count = pop_count(our_pieces)
+
+    their_pieces = board.occupied_co[not board.turn]
+    t_piece_count = pop_count(their_pieces)
+
+    if o_piece_count <= 5 and t_piece_count <= 5:
+        return True
+
+    return False
+
+
 def _evaluate_white_piece_tables(board):
     value = 0
     # SquareSet of pawns
@@ -382,7 +393,10 @@ def _evaluate_white_piece_tables(board):
         value += QUEEN_TABLE_W[63 - q]
 
     # King
-    king_table = KING_TABLE_W_MIDDLE
+    if is_end_game(board):
+        king_table = KING_TABLE_W_END
+    else:
+        king_table = KING_TABLE_W_MIDDLE
     # TODO ADD ENDGAME TABLE
     for king in kings:
         value += king_table[63 - king]
@@ -421,7 +435,10 @@ def _evaluate_black_piece_tables(board):
         value += QUEEN_TABLE_B[63 - q]
 
     # King
-    king_table = KING_TABLE_B_MIDDLE
+    if is_end_game(board):
+        king_table = KING_TABLE_B_END
+    else:
+        king_table = KING_TABLE_B_MIDDLE
     # TODO ADD ENDGAME TABLE
     for king in kings:
         value += king_table[63 - king]

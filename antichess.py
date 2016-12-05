@@ -75,6 +75,7 @@ if __name__ == "__main__":
     DEFAULT_FIRST_MOVE = "b1c3"
 
     # Initialize the board
+    # board = antichess_board.AntichessBoard("4k3/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
     board = antichess_board.AntichessBoard()
 
     # Input loop
@@ -93,7 +94,6 @@ if __name__ == "__main__":
                 endgame_type = get_endgame_type(board)
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
-                start = time()
                 if endgame_type:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
@@ -101,18 +101,19 @@ if __name__ == "__main__":
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
                 else:
-                    ab = minmax.AlphaBeta(1000, board)
+                    ab = minmax.AlphaBeta(5, board)
                     move = str(ab.get_best_move(board))
-                end = time()
 
                 print "Time Taken: %.10f" % (end - start)
                 try:
                     m = board.push_uci(move)
+                    print(m.uci())
                     break
                 except ValueError:
                     print ("Illegal Move: %s" % move)
                     print_legal_moves(board)
                     continue
+
         else:
             # Not our turn wait for their input
             while True:
