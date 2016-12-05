@@ -18,6 +18,7 @@ def make_random_move(board):
 
     return None
 
+
 def get_endgame_type(board):
     NOT_ENDGAME = 0
     ONE_ROOK_ENDGAME = 1        # Not implemented
@@ -79,13 +80,6 @@ if __name__ == "__main__":
 
     # Input loop
     while not board.is_game_over():
-        # print "Val: %f" % minmax.evaluate(board)
-
-        # if board.turn:
-        #     print "Player: %s" % "White"
-        # else:
-        #     print "Player: %s" % "Black"
-
         if is_white == board.turn:
             # It's our turn
 
@@ -93,7 +87,7 @@ if __name__ == "__main__":
                 endgame_type = get_endgame_type(board)
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
-                start = time()
+
                 if endgame_type and endgame_type <= 2:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
@@ -103,9 +97,7 @@ if __name__ == "__main__":
                 else:
                     ab = minmax.AlphaBeta(4, 1000, board)
                     move = str(ab.get_best_move(board))
-                end = time()
 
-                print "Time Taken: %.10f" % (end - start)
                 try:
                     m = board.push_uci(move)
                     break
@@ -137,10 +129,5 @@ if __name__ == "__main__":
         print board
         print("")
 
-    # print("Final Board:")
-    # print(board)
     print("GAME OVER!")
     print(board.result())
-    # print(board.legal_moves)
-
-    # print(minmax.evaluate(board))
