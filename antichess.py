@@ -102,34 +102,36 @@ if __name__ == "__main__":
 
                 try:
                     m = board.push_uci(move)
+                    print(m.uci())
                     break
                 except ValueError:
-                    print ("Illegal Move: %s" % move)
-                    print_legal_moves(board)
+                    # print ("Illegal Move: %s" % move)
+                    # print_legal_moves(board)
                     continue
         else:
             # Not our turn wait for their input
             while True:
-                enemy_move = raw_input("Move: ")
+                # enemy_move = raw_input("Move: ")
+                enemy_move = raw_input()
 
                 # rand_move = random.randint(1, 3)
 
                 # if rand_move == 1:
                 #     enemy_move = make_random_move(board)
                 # else:
-                #     ab = minmax.AlphaBeta(100, board)
+                #     ab = minmax.AlphaBeta(3, 100, board)
                 #     enemy_move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(enemy_move)
                     break
                 except ValueError:
-                    print ("Illegal Move: %s" % enemy_move)
-                    print_legal_moves(board)
+                    # print ("Illegal Move: %s" % enemy_move)
+                    # print_legal_moves(board)
                     continue
 
-        print board
-        print("")
+        # print board
+        # print("")
 
-    print("GAME OVER!")
-    print(board.result())
+    # print("GAME OVER!")
+    # print(board.result())
