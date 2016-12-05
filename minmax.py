@@ -11,12 +11,13 @@ def unwrap_self_f(arg, **kwarg):
 
 
 class AlphaBeta:
-    def __init__(self, factor, board):
+    def __init__(self, depth, factor, board):
         self.factor = factor
         self.board = board
+        self.depth = depth
 
     def _get_move_utility(self, board):
-        return self.min_alpha_beta(board, 1, float('-inf'), float('inf'))
+        return self.min_alpha_beta(board, 1, 1, float('-inf'), float('inf'))
 
     def get_best_move(self, board):
         legal_moves = list(board.legal_moves)
@@ -37,8 +38,8 @@ class AlphaBeta:
     def min_max(self):
         return self.max_alpha_beta(self.board, 0, float('-inf'), float('inf'))
 
-    def max_alpha_beta(self, board, curr_factor, alpha, beta):
-        if curr_factor >= self.factor:
+    def max_alpha_beta(self, board, curr_depth, curr_factor, alpha, beta):
+        if curr_depth >= self.depth and curr_factor >= self.factor:
             if is_quiet_position(board):
                 return evaluate(board)
             else:
@@ -52,14 +53,14 @@ class AlphaBeta:
             move_found = True
             child_board = board.copy()
             child_board.push(move)
-            value = max(value, self.min_alpha_beta(child_board, curr_factor*legal_moves_len, value, beta))
-            if value >= beta or curr_factor*(i+1) >= self.factor:
+            value = max(value, self.min_alpha_beta(child_board, curr_depth + 1, curr_factor*legal_moves_len, value, beta))
+            if value >= beta or (curr_depth >= self.depth and curr_factor*(i+1) >= self.factor):
                 break
 
         return value if move_found else float('-inf')
 
-    def min_alpha_beta(self, board, curr_factor, alpha, beta):
-        if curr_factor >= self.factor:
+    def min_alpha_beta(self, board, curr_depth, curr_factor, alpha, beta):
+        if curr_depth >= self.depth and curr_factor >= self.factor:
             if is_quiet_position(board):
                 return -evaluate(board)
             else:
@@ -73,8 +74,8 @@ class AlphaBeta:
             move_found = True
             child_board = board.copy()
             child_board.push(move)
-            value = min(value, self.max_alpha_beta(child_board, curr_factor*legal_moves_len, alpha, value))
-            if value <= alpha or curr_factor*(i+1) >= self.factor:
+            value = min(value, self.max_alpha_beta(child_board, curr_depth + 1, curr_factor*legal_moves_len, alpha, value))
+            if value <= alpha or (curr_depth >= self.depth and curr_factor*(i+1) >= self.factor):
                 break
 
         return value if move_found else float('inf')
@@ -337,7 +338,7 @@ KING_TABLE_B_END = [
     -50,-40,-30,-20,-20,-30,-40,-50]
 
 def evaluate_piece_tables(board):
-    WEIGHT = 0.1
+    WEIGHT = 0.25
     turn = board.turn
 
     white_value = _evaluate_white_piece_tables(board)
