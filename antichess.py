@@ -81,7 +81,9 @@ if __name__ == "__main__":
 
     # Initialize the board
     # TODO: Initialize our antichess variant
-    board = antichess_board.AntichessBoard()
+    board = antichess_board.AntichessBoard("8/8/8/8/4Q3/8/K7/2k5 w - - 0 1")
+        #"8/8/8/8/8/5Q2/8/K1k5 w - - 0 1")
+    #8/8/8/8/4Q3/8/K7/2k5 w - - 0 1
 
     print "Starting Board:"
     print board
@@ -102,7 +104,7 @@ if __name__ == "__main__":
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
                 start = time()
-                if endgame_type:
+                if endgame_type and endgame_type <= 2:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
                 elif first_move and is_white:
