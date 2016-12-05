@@ -18,12 +18,13 @@ def make_random_move(board):
 
     return None
 
+
 def get_endgame_type(board):
     NOT_ENDGAME = 0
-    ONE_ROOK_ENDGAME = 1        # Not implemented
-    ONE_QUEEN_ENDGAME = 2       # Not implemented
-    TWO_ROOKS_ENDGAME = 3       # Not implemented
-    ROOK_AND_QUEEN_ENDGAME = 4  # Not implemented
+    ONE_ROOK_ENDGAME = 1
+    ONE_QUEEN_ENDGAME = 2
+    TWO_ROOKS_ENDGAME = 3
+    ROOK_AND_QUEEN_ENDGAME = 4
 
     o_pieces = pop_count(board.occupied_co[board.turn])
     t_pieces = pop_count(board.occupied_co[not board.turn])
@@ -75,17 +76,11 @@ if __name__ == "__main__":
     DEFAULT_FIRST_MOVE = "b1c3"
 
     # Initialize the board
+    # board = antichess_board.AntichessBoard("4k3/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
     board = antichess_board.AntichessBoard()
 
     # Input loop
     while not board.is_game_over():
-        # print "Val: %f" % minmax.evaluate(board)
-
-        # if board.turn:
-        #     print "Player: %s" % "White"
-        # else:
-        #     print "Player: %s" % "Black"
-
         if is_white == board.turn:
             # It's our turn
 
@@ -93,8 +88,8 @@ if __name__ == "__main__":
                 endgame_type = get_endgame_type(board)
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
-                start = time()
-                if endgame_type and endgame_type <= 2:
+
+                if endgame_type and endgame_type <= 4:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
                 elif first_move and is_white:
@@ -103,45 +98,40 @@ if __name__ == "__main__":
                 else:
                     ab = minmax.AlphaBeta(3, 1000, board)
                     move = str(ab.get_best_move(board))
-                end = time()
 
-                print "Time Taken: %.10f" % (end - start)
                 try:
                     print "value: %.10f" % (minmax.evaluate(board))
                     m = board.push_uci(move)
+                    print(m.uci())
                     break
                 except ValueError:
-                    print ("Illegal Move: %s" % move)
-                    print_legal_moves(board)
+                    # print ("Illegal Move: %s" % move)
+                    # print_legal_moves(board)
                     continue
         else:
             # Not our turn wait for their input
             while True:
                 # enemy_move = raw_input("Move: ")
+                enemy_move = raw_input()
 
-                rand_move = random.randint(1, 3)
+                # rand_move = random.randint(1, 3)
 
-                if rand_move == 1:
-                    enemy_move = make_random_move(board)
-                else:
-                    ab = minmax.AlphaBeta(3, 100, board)
-                    enemy_move = str(ab.get_best_move(board))
+                # if rand_move == 1:
+                #     enemy_move = make_random_move(board)
+                # else:
+                #     ab = minmax.AlphaBeta(3, 100, board)
+                #     enemy_move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(enemy_move)
                     break
                 except ValueError:
-                    print ("Illegal Move: %s" % enemy_move)
-                    print_legal_moves(board)
+                    # print ("Illegal Move: %s" % enemy_move)
+                    # print_legal_moves(board)
                     continue
 
-        print board
-        print("")
+        # print board
+        # print("")
 
-    # print("Final Board:")
-    # print(board)
-    print("GAME OVER!")
-    print(board.result())
-    # print(board.legal_moves)
-
-    # print(minmax.evaluate(board))
+    # print("GAME OVER!")
+    # print(board.result())
