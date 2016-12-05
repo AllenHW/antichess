@@ -21,10 +21,10 @@ def make_random_move(board):
 
 def get_endgame_type(board):
     NOT_ENDGAME = 0
-    ONE_ROOK_ENDGAME = 1        # Not implemented
-    ONE_QUEEN_ENDGAME = 2       # Not implemented
-    TWO_ROOKS_ENDGAME = 3       # Not implemented
-    ROOK_AND_QUEEN_ENDGAME = 4  # Not implemented
+    ONE_ROOK_ENDGAME = 1
+    ONE_QUEEN_ENDGAME = 2
+    TWO_ROOKS_ENDGAME = 3
+    ROOK_AND_QUEEN_ENDGAME = 4
 
     o_pieces = pop_count(board.occupied_co[board.turn])
     t_pieces = pop_count(board.occupied_co[not board.turn])

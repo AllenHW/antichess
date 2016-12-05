@@ -331,26 +331,19 @@ class EndgameBase:
 
         legal_moves = list(board.legal_moves)
 
-        # min_total_d = float("inf")
         min_total_d = self._distance(board, king_sq, enemy_king_sq)
         prev_best_move = None
         best_move = legal_moves[0]
-        backup_move = None
         kings_same_quadrant = False
         queen_knight_distance_away = self._is_knight_distance_away(board, queen_sq, enemy_king_sq)
 
         kings_same_quadrant = self._both_kings_same_quadrant(board, queen_sq, king_sq, enemy_king_sq)
-        if self._is_knight_distance_away(board, queen_sq, enemy_king_sq):
-            print "Queen knight distance away from king"
 
         finish_move = self._get_finish_move_endgame_2(board, queen_sq, king_sq, enemy_king_sq)
         if finish_move:
-            print "Finish move: {0}".format(finish_move)
             return finish_move
 
         for move in legal_moves:
-            print "===== CASE TWO ======="
-            print move
             child_board = board.copy()
             child_board.push(move)
             if (child_board.is_checkmate()):
@@ -360,8 +353,6 @@ class EndgameBase:
                 break
             elif (child_board.is_check() or child_board.is_stalemate()):
                 continue
-            # elif queen_knight_distance_away and move.from_square == queen_sq:
-            #     continue
             else:
                 queen_sq = list(child_board.pieces(chess.QUEEN, not child_board.turn))[0]
                 king_sq = list(child_board.pieces(chess.KING, not child_board.turn))[0]
@@ -370,18 +361,10 @@ class EndgameBase:
                 d = self._distance(child_board, king_sq, enemy_king_sq)
                 child_is_queen_attacked = list(child_board.attackers(child_board.turn, queen_sq))
                 child_is_queen_protected = self._is_piece_protected_by_king(child_board, queen_sq, king_sq)
-                # print "enemy_king_sq {0} enemy_king_area {1}".format(enemy_king_sq, enemy_king_area)
-                print "Enemy king trapped? {0}".format(enemy_king_trapped)
-                print "enemy king area {0} min_area {1}".format(enemy_king_area, min_enemy_king_area)
-                
-                # if self._is_king_picking(child_board, queen_sq, king_sq, enemy_king_sq):
-                #     print "Case 1"
-                #     continue
+
                 if child_is_queen_attacked and not child_is_queen_protected:
-                    print "Queen attacked and not protected"
                     continue
                 elif self._both_kings_same_quadrant(child_board, queen_sq, king_sq, enemy_king_sq):
-                    print "Same quadrant"
                     continue
                 if (enemy_king_trapped):
                     if (d < min_total_d):
@@ -392,21 +375,14 @@ class EndgameBase:
                             best_move = move
 
                 elif (enemy_king_area <= min_enemy_king_area) and (d <= min_total_d):
-                # elif (enemy_king_area < min_enemy_king_area) and (d < min_total_d):
                     min_enemy_king_area = enemy_king_area
                     prev_best_move = best_move
                     best_move = move
-                    # return str(best_move)
 
-        print "Case two best move {0}".format(best_move)
         if prev_best_move:
-            print "Case one sufficient, returning move {0}".format(best_move)
             return str(best_move)
-        else:
-            print "Onto case 1"
 
         if queen_knight_distance_away:
-            print "======== CASE ONE ========="
             for move in legal_moves:
                 print move
                 child_board = board.copy()
@@ -418,8 +394,6 @@ class EndgameBase:
                     break
                 elif (child_board.is_check() or child_board.is_stalemate()):
                     continue
-                # elif queen_knight_distance_away and move.from_square == queen_sq:
-                #     continue
                 else:
                     queen_sq = list(child_board.pieces(chess.QUEEN, not child_board.turn))[0]
                     king_sq = list(child_board.pieces(chess.KING, not child_board.turn))[0]
@@ -431,27 +405,14 @@ class EndgameBase:
                         min_total_d = d
                         prev_best_move = best_move
                         best_move = move
-            print "Queen knight distance away, returning best move {0}".format(best_move)
             return str(best_move)
-
-        print "Case THREE??????"
-
-        print "prev best move {0}".format(prev_best_move)
-        print "best move {0}".format(best_move)
-        print "min_d {0}".format(min_total_d)
-
-        # Check case where enemy king trapped and min_total_d = inf
 
         if not prev_best_move or (enemy_king_trapped and min_total_d == float("inf")):
             prev_best_move = None
-            print "****************PROBLEM"
-            # exit(0)
             min_total_d = float("inf")
             # Take good queen move that doesn't stalemate and doesn't check
             # This is to deal with cases like "8/8/8/8/8/5Q2/8/K1k5 w - - 0 1"
             for move in legal_moves:
-                print "Move {0}".format(move)
-                # kings_same_quadrant = False
                 child_board = board.copy()
                 child_board.push(move)
                 
@@ -462,34 +423,11 @@ class EndgameBase:
                 child_is_queen_attacked = list(child_board.attackers(child_board.turn, queen_sq))
                 child_is_queen_protected = self._is_piece_protected_by_king(child_board, queen_sq, king_sq)
                 
-                print "enemy king area {0}".format(enemy_king_area)
-                # if (self._both_kings_same_quadrant(child_board, queen_sq, king_sq, enemy_king_sq)):
-                #     kings_same_quadrant = True
-
                 if not (child_board.is_stalemate() and (not child_is_queen_attacked or child_is_queen_protected)):
                     if (random.random() < 0.5):
                         best_move = move
                         break
 
-                # print "checkmate? {0} stalemate? {1}".format(child_board.is_checkmate(), child_board.is_stalemate())
-                # if not (child_board.is_checkmate() or child_board.is_stalemate()):
-                #     d = self._distance(child_board, queen_sq, enemy_king_sq)
-                #     print "d: {0} min_d: {1}".format(d, min_total_d)
-                #     # if (d < min_total_d):
-                #     print "is queen protected by king after move? {0}".format(self._is_piece_protected_by_king(child_board, queen_sq, king_sq))
-                #     if self._is_piece_protected_by_king(child_board, queen_sq, king_sq):
-                #         backup_move = move
-                #     if (self._is_piece_protected_by_king(child_board, queen_sq, king_sq)) and (enemy_king_area <= min_enemy_king_area) and not kings_same_quadrant:
-                #         print "Found better move {0}".format(move)
-                #         # min_total_d = d
-                #         min_enemy_king_area = enemy_king_area
-                #         prev_best_move = best_move
-                #         best_move = move
-                #         continue
-
-        print "Backup move: {0}".format(backup_move)
-        if not prev_best_move:
-            best_move = backup_move
         return str(best_move)
 
     def _get_move_endgame_3_and_4(self, board):        
@@ -542,61 +480,6 @@ class EndgameBase:
         
         return str(best_move)
 
-    # def _get_move_endgame_4(self, board):
-    #     assert(len(board.pieces(chess.ROOK, board.turn)) == 1)
-    #     assert(len(board.pieces(chess.QUEEN, board.turn)) == 1)
-    #     assert(len(board.pieces(chess.KING, board.turn)) == 1)
-    #     assert(len(board.pieces(chess.KING, not board.turn)) == 1)
-        
-    #     rook_sq = list(board.pieces(chess.ROOK, board.turn))[0]
-    #     king_sq = list(board.pieces(chess.KING, board.turn))[0]
-    #     enemy_king_sq = list(board.pieces(chess.KING, not board.turn))[0]
-        
-    #     is_rook_attacked = list(board.attackers(not board.turn, rook_sq))
-    #     is_rook_protected = self._is_piece_protected_by_king(board, rook_sq, king_sq)
-    #     min_enemy_king_area = self._get_king_movement_area(board, rook_sq, enemy_king_sq)
-        
-    #     legal_moves = list(board.legal_moves)
-    #     child_boards = []
-
-    #     min_total_d = float("inf")
-    #     prev_best_move = legal_moves[0]
-    #     best_move = legal_moves[0]
-
-    #     for move in legal_moves:
-    #         child_board = board.copy()
-    #         child_board.push(move)
-    #         if (child_board.is_checkmate()):
-    #             # Make this move as it will checkmate
-    #             best_move = move
-    #             break
-    #         elif (child_board.is_check() or child_board.is_stalemate()):
-    #             continue
-    #         else:
-    #             rook_sq = list(child_board.pieces(chess.ROOK, not child_board.turn))[0]
-    #             king_sq = list(child_board.pieces(chess.KING, not child_board.turn))[0]
-    #             enemy_king_sq = list(child_board.pieces(chess.KING, child_board.turn))[0]
-    #             enemy_king_area = self._get_king_movement_area(child_board, rook_sq, enemy_king_sq)
-    #             child_is_rook_attacked = list(child_board.attackers(child_board.turn, rook_sq))
-    #             child_is_rook_protected = self._is_piece_protected_by_king(child_board, rook_sq, king_sq)
-                
-    #             if child_is_rook_attacked and not child_is_rook_protected:
-    #                 # Make this move to simplify to ONE_QUEEN_ENDGAME
-    #                 best_move = move
-    #                 break
-            
-    #             d = self._distance(child_board, king_sq, rook_sq) + self._distance(child_board, rook_sq, enemy_king_sq) + self._distance(child_board, king_sq, enemy_king_sq)
-            
-    #             if  (d <= min_total_d) and (enemy_king_area <= min_enemy_king_area):
-    #                 if (enemy_king_area == min_enemy_king_area) and (d == min_total_d):
-    #                     if (random.random() < 0.5):
-    #                         continue
-    #                 min_total_d = d
-    #                 prev_best_move = best_move
-    #                 best_move = move
-        
-    #     return str(best_move)
-
     def get_best_move(self, board):
         if self.endgame_type == self.ONE_ROOK_ENDGAME:
             assert(len(board.pieces(chess.ROOK, board.turn)) == 1)
@@ -622,3 +505,13 @@ class EndgameBase:
 
         print "Endgame {0} called but not implemented yet, exiting".format(self.endgame_type)
         exit(0)
+
+# Tests for Queen endgame
+    # board = antichess_board.AntichessBoard("8/8/8/8/8/8/3Q4/k3K3 w - - 0 1")
+    # board = antichess_board.AntichessBoard("8/8/8/8/8/8/3Q4/k4K2 w - - 0 1")
+    # board = antichess_board.AntichessBoard("6Q1/8/7k/8/7K/8/8/8 w - - 0 1")
+    # board = antichess_board.AntichessBoard("8/8/8/8/8/8/1Q6/K2k4 w - - 0 1")
+    # board = antichess_board.AntichessBoard("8/8/8/5k2/8/8/1Q6/K7 w - - 0 1")
+    # board = antichess_board.AntichessBoard("8/7k/5Q2/8/8/8/8/K7 w - - 0 1")
+    # board = antichess_board.AntichessBoard("8/8/8/8/8/8/4Q3/K5k1 w - - 0 1")
+    # board = antichess_board.AntichessBoard("8/8/8/8/8/8/4Q3/4K1k1 w - - 0 1")
