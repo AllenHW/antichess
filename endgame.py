@@ -200,7 +200,7 @@ class EndgameBase:
                 enemy_king_sq = list(child_board.pieces(chess.KING, child_board.turn))[0]
                 enemy_king_area = self._get_king_movement_area(child_board, rook_sq, enemy_king_sq)
                 child_is_rook_attacked = list(child_board.attackers(child_board.turn, rook_sq))
-                child_is_rook_protected = self._is_rook_protected(child_board, rook_sq, king_sq)
+                child_is_rook_protected = self._is_piece_protected_by_king(child_board, rook_sq, king_sq)
                 
                 if self._is_king_picking(child_board, rook_sq, king_sq, enemy_king_sq):
                     # Don't make this move as the king is picking the rook
