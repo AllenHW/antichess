@@ -69,30 +69,22 @@ if __name__ == "__main__":
         print "One of (b, w, black, white)"
         exit(0)
 
-    # if len(args) >= 3 and args[2] == "debug":
-    #     debug = True
-    # else:
-    #     debug = False
-
     # Player colour
     is_white = (colour == 'w' or colour == 'white')
     first_move = True
     DEFAULT_FIRST_MOVE = "b1c3"
 
     # Initialize the board
-    # TODO: Initialize our antichess variant
     board = antichess_board.AntichessBoard()
 
-    print "Starting Board:"
-    print board
     # Input loop
     while not board.is_game_over():
-        print "Val: %f" % minmax.evaluate(board)
+        # print "Val: %f" % minmax.evaluate(board)
 
-        if board.turn:
-            print "Player: %s" % "White"
-        else:
-            print "Player: %s" % "Black"
+        # if board.turn:
+        #     print "Player: %s" % "White"
+        # else:
+        #     print "Player: %s" % "Black"
 
         if is_white == board.turn:
             # It's our turn
@@ -114,10 +106,8 @@ if __name__ == "__main__":
                 end = time()
 
                 print "Time Taken: %.10f" % (end - start)
-
                 try:
                     m = board.push_uci(move)
-                    print "MOVED: %s" % m
                     break
                 except ValueError:
                     print ("Illegal Move: %s" % move)
@@ -138,7 +128,6 @@ if __name__ == "__main__":
 
                 try:
                     m = board.push_uci(enemy_move)
-                    print "MOVED: %s" % m
                     break
                 except ValueError:
                     print ("Illegal Move: %s" % enemy_move)
@@ -148,10 +137,10 @@ if __name__ == "__main__":
         print board
         print("")
 
-    print("Final Board:")
-    print(board)
+    # print("Final Board:")
+    # print(board)
     print("GAME OVER!")
     print(board.result())
-    print(board.legal_moves)
+    # print(board.legal_moves)
 
-    print(minmax.evaluate(board))
+    # print(minmax.evaluate(board))

@@ -1,5 +1,7 @@
 from python_chess import chess
 from python_chess.chess import pop_count
+# from quiescent_search import is_quiet_position
+# from quiescent_search import quiescent_search
 from multiprocessing import Pool
 import operator
 import multiprocessing
@@ -37,6 +39,10 @@ class AlphaBeta:
 
     def max_alpha_beta(self, board, curr_factor, alpha, beta):
         if curr_factor >= self.factor:
+            # if is_quiet_position(board):
+            #     return evaluate(board)
+            # else:
+            #     return quiescent_search(board, alpha, beta, evaluate)
             return evaluate(board)
 
         value = alpha
@@ -55,6 +61,10 @@ class AlphaBeta:
 
     def min_alpha_beta(self, board, curr_factor, alpha, beta):
         if curr_factor >= self.factor:
+            # if is_quiet_position(board):
+            #     return -evaluate(board)
+            # else:
+            #     return -quiescent_search(board, alpha, beta, evaluate)
             return -evaluate(board)
 
         value = beta
@@ -70,6 +80,7 @@ class AlphaBeta:
                 break
 
         return value if move_found else float('inf')
+
 
 def evaluate(board):
     total_value = 0
@@ -160,7 +171,7 @@ def evaluate_mobility_advantage(board, try_pseudo_capture_first=False):
     waiter_mobility = _evaluate_mobility_by_side(board, try_pseudo_capture_first)
     board.pop()
 
-    return 0.8 * (mover_mobility - waiter_mobility)
+    return 0.5 * (mover_mobility - waiter_mobility)
 
 
 def _evaluate_mobility_by_side(board, try_pseudo_capture_first=False):
@@ -328,7 +339,7 @@ KING_TABLE_B_END = [
     -50,-40,-30,-20,-20,-30,-40,-50]
 
 def evaluate_piece_tables(board):
-    WEIGHT = 0.05
+    WEIGHT = 0.1
     turn = board.turn
 
     white_value = _evaluate_white_piece_tables(board)
