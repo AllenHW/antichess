@@ -28,11 +28,6 @@ def get_endgame_type(board):
     o_pieces = pop_count(board.occupied_co[board.turn])
     t_pieces = pop_count(board.occupied_co[not board.turn])
 
-    print "???"
-    print o_pieces
-    print t_pieces
-    print "???"
-
     if t_pieces > 1:
         return NOT_ENDGAME
 
@@ -86,7 +81,7 @@ if __name__ == "__main__":
 
     # Initialize the board
     # TODO: Initialize our antichess variant
-    board = antichess_board.AntichessBoard("8/8/7Q/8/6R1/2K5/k7/8 w - - 0 1")
+    board = antichess_board.AntichessBoard()
 
     print "Starting Board:"
     print board
@@ -104,7 +99,6 @@ if __name__ == "__main__":
 
             while True:
                 endgame_type = get_endgame_type(board)
-                print "This is endgame type {0}".format(endgame_type)
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
                 start = time()
