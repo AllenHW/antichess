@@ -297,9 +297,7 @@ class EndgameBase:
                     min_enemy_king_area = enemy_king_area
                     prev_best_move = best_move
                     best_move = move
-        
-        print "First best move {0}".format(best_move)
-        
+
         if not prev_best_move:
             min_total_d = float("inf")
             # Take good queen move that doesn't stalemate and doesn't check
