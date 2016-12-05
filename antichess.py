@@ -109,8 +109,7 @@ if __name__ == "__main__":
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
                 else:
-                    # Change back to 5 later
-                    ab = minmax.AlphaBeta(1, board)
+                    ab = minmax.AlphaBeta(5, board)
                     move = str(ab.get_best_move(board))
                 end = time()
 
