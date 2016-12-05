@@ -68,45 +68,6 @@ class AlphaBeta:
 
         return value if move_found else float('inf')
 
-    # Single method alphabeta
-    # def alphabeta(self, board, depth, alpha, beta, maximizingPlayer):
-    #     if depth == 0:
-    #         return evaluate_board(board)
-
-    #     if maximizingPlayer:
-    #         move_made = False
-    #         v = float('-inf')
-    #         for move in board.legal_moves:
-    #             move_made = True
-    #             child_board = board.copy()
-    #             child_board.push(move)
-    #             v = max(v, self.alphabeta(child_board, depth - 1, alpha, beta, False))
-    #             alpha = max(alpha, v)
-    #             if beta <= alpha:
-    #                 break
-
-    #         if move_made:
-    #             return v
-    #         else:
-    #             return evaluate_board(board)
-    #     else:
-    #         move_made = False
-    #         v = float('inf')
-    #         for move in board.legal_moves:
-    #             move_made = True
-    #             child_board = board.copy()
-    #             child_board.push(move)
-    #             v = min(v, self.alphabeta(child_board, depth - 1, alpha, beta, True))
-    #             beta = min(beta, v)
-    #             if beta <= alpha:
-    #                 break
-
-    #         if move_made:
-    #             return v
-    #         else:
-    #             return evaluate_board(board)
-
-
 def evaluate(board):
     total_value = 0
     material_value = evaluate_material(board)
@@ -139,19 +100,19 @@ def evaluate_material(board):
     t_ratio = (16.0 - t_piece_count) / 16.0
     o_ratio = (16.0 - o_piece_count) / 16.0
     # Knight
-    knight_o_multi = max(1.5, t_ratio * BASE_KNIGHT_VALUE)
-    knight_t_multi = max(1.5, o_ratio * BASE_KNIGHT_VALUE)
+    knight_o_multi = max(3.0, t_ratio * BASE_KNIGHT_VALUE)
+    knight_t_multi = max(3.0, o_ratio * BASE_KNIGHT_VALUE)
 
     # Bishop
-    bishop_o_multi = max(1.6, t_ratio * BASE_BISHOP_VALUE)
-    bishop_t_multi = max(1.6, o_ratio * BASE_BISHOP_VALUE)
+    bishop_o_multi = max(2.7, t_ratio * BASE_BISHOP_VALUE)
+    bishop_t_multi = max(2.7, o_ratio * BASE_BISHOP_VALUE)
 
     # Rook
-    rook_o_multi = max(1.8, t_ratio * BASE_ROOK_VALUE)
-    rook_t_multi = max(1.8, o_ratio * BASE_ROOK_VALUE)
+    rook_o_multi = max(3.5, t_ratio * BASE_ROOK_VALUE)
+    rook_t_multi = max(3.5, o_ratio * BASE_ROOK_VALUE)
 
-    queen_o_multi = max(2, t_ratio * BASE_QUEEN_VALUE)
-    queen_t_multi = max(2, o_ratio * BASE_QUEEN_VALUE)
+    queen_o_multi = max(7, t_ratio * BASE_QUEEN_VALUE)
+    queen_t_multi = max(7, o_ratio * BASE_QUEEN_VALUE)
 
     # King
     o_kings = pop_count(our_pieces & board.kings)
@@ -195,7 +156,7 @@ def evaluate_mobility_advantage(board, try_pseudo_capture_first=False):
     waiter_mobility = _evaluate_mobility_by_side(board, try_pseudo_capture_first)
     board.pop()
 
-    return 0.2*(mover_mobility - waiter_mobility)
+    return 0.8 * (mover_mobility - waiter_mobility)
 
 
 def _evaluate_mobility_by_side(board, try_pseudo_capture_first=False):
@@ -363,7 +324,7 @@ KING_TABLE_B_END = [
     -50,-40,-30,-20,-20,-30,-40,-50]
 
 def evaluate_piece_tables(board):
-    WEIGHT = 0.2
+    WEIGHT = 0.4
     turn = board.turn
 
     white_value = _evaluate_white_piece_tables(board)

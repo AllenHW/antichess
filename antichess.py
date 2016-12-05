@@ -80,7 +80,7 @@ if __name__ == "__main__":
                     move = str(ab.get_best_move(board))
                 end = time()
 
-                print "Time Taken: %d" % (end-start)
+                print "Time Taken: %.10f" % (end - start)
 
                 try:
                     m = board.push_uci(move)
@@ -100,7 +100,7 @@ if __name__ == "__main__":
                 if rand_move == 1:
                     enemy_move = make_random_move(board)
                 else:
-                    ab = minmax.AlphaBeta(2, board)
+                    ab = minmax.AlphaBeta(3, board)
                     enemy_move = str(ab.get_best_move(board))
 
                 try:
