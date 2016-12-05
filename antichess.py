@@ -94,7 +94,7 @@ if __name__ == "__main__":
                 endgame_type = get_endgame_type(board)
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
-                if endgame_type:
+
                 if endgame_type and endgame_type <= 2:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
@@ -102,7 +102,7 @@ if __name__ == "__main__":
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
                 else:
-                    ab = minmax.AlphaBeta(5, board)
+                    ab = minmax.AlphaBeta(1000, board)
                     move = str(ab.get_best_move(board))
 
                 try:
