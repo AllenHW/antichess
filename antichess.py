@@ -1,5 +1,7 @@
 from python_chess import chess
+from python_chess.chess import pop_count
 import antichess_board
+import endgame
 import minmax
 
 import random
@@ -15,6 +17,33 @@ def make_random_move(board):
         return str(moves[move_index])
 
     return None
+
+def get_endgame_type(board):
+    NOT_ENDGAME = 0
+    ONE_ROOK_ENDGAME = 1        # Not implemented
+    ONE_QUEEN_ENDGAME = 2       # Not implemented
+    TWO_ROOKS_ENDGAME = 3       # Not implemented
+    ROOK_AND_QUEEN_ENDGAME = 4  # Not implemented
+
+    o_pieces = pop_count(board.occupied_co[board.turn])
+    t_pieces = pop_count(board.occupied_co[not board.turn])
+
+    if t_pieces > 1:
+        return NOT_ENDGAME
+
+    o_rooks = len(list(board.pieces(chess.ROOK, board.turn)))
+    o_queens = len(list(board.pieces(chess.QUEEN, board.turn)))
+
+    if o_pieces == 2 and o_rooks == 1:
+        return ONE_ROOK_ENDGAME
+    elif o_pieces == 2 and o_queens == 1:
+        return ONE_QUEEN_ENDGAME
+    elif o_pieces == 3 and o_rooks == 2:
+        return TWO_ROOKS_ENDGAME
+    elif o_pieces == 3 and o_rooks == 1 and o_queens == 1:
+        return ROOK_AND_QUEEN_ENDGAME
+
+    return NOT_ENDGAME
 
 
 def print_legal_moves(board):
@@ -69,10 +98,14 @@ if __name__ == "__main__":
             # It's our turn
 
             while True:
+                endgame_type = get_endgame_type(board)
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
                 start = time()
-                if first_move and is_white:
+                if endgame_type:
+                    eg = endgame.EndgameBase(board, endgame_type)
+                    move = eg.get_best_move(board)
+                elif first_move and is_white:
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
                 else:
@@ -93,15 +126,15 @@ if __name__ == "__main__":
         else:
             # Not our turn wait for their input
             while True:
-                # enemy_move = raw_input("Move: ")
+                enemy_move = raw_input("Move: ")
 
-                rand_move = random.randint(1, 3)
+                # rand_move = random.randint(1, 3)
 
-                if rand_move == 1:
-                    enemy_move = make_random_move(board)
-                else:
-                    ab = minmax.AlphaBeta(3, board)
-                    enemy_move = str(ab.get_best_move(board))
+                # if rand_move == 1:
+                #     enemy_move = make_random_move(board)
+                # else:
+                #     ab = minmax.AlphaBeta(2, board)
+                #     enemy_move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(enemy_move)
