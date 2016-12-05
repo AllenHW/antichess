@@ -95,6 +95,7 @@ if __name__ == "__main__":
                 # move = raw_input("Our Move: ")
                 # move = make_random_move(board)
                 if endgame_type:
+                if endgame_type and endgame_type <= 2:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
                 elif first_move and is_white:
@@ -104,7 +105,6 @@ if __name__ == "__main__":
                     ab = minmax.AlphaBeta(5, board)
                     move = str(ab.get_best_move(board))
 
-                print "Time Taken: %.10f" % (end - start)
                 try:
                     m = board.push_uci(move)
                     print(m.uci())
