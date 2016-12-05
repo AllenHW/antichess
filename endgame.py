@@ -167,8 +167,6 @@ class EndgameBase:
         assert(len(board.pieces(chess.KING, board.turn)) == 1)
         assert(len(board.pieces(chess.KING, not board.turn)) == 1)
         
-        best_move = None
-        
         rook_sq = list(board.pieces(chess.ROOK, board.turn))[0]
         king_sq = list(board.pieces(chess.KING, board.turn))[0]
         enemy_king_sq = list(board.pieces(chess.KING, not board.turn))[0]
@@ -253,8 +251,6 @@ class EndgameBase:
         assert(len(board.pieces(chess.KING, board.turn)) == 1)
         assert(len(board.pieces(chess.KING, not board.turn)) == 1)
         
-        best_move = None
-        
         queen_sq = list(board.pieces(chess.QUEEN, board.turn))[0]
         queen_sq_copy = queen_sq
         king_sq = list(board.pieces(chess.KING, board.turn))[0]
@@ -274,30 +270,7 @@ class EndgameBase:
         if (self._both_kings_same_quadrant(board, queen_sq, king_sq, enemy_king_sq)):
             kings_same_quadrant = True
 
-        # if kings_same_quadrant:
-        #     # Take first queen move that doesn't stalemate and doesn't check
-        #     # This is to deal with cases like "8/8/8/8/8/5Q2/8/K1k5 w - - 0 1"
-        #     kings_same_quadrant = False
-        #     print "Best move kings are in same quadrant, looking for queen move"
-        #     for move in legal_moves:
-        #         print "Move {0}".format(move)
-        #         print "Move from {0} king was at {1} queen was at {2}".format(move.from_square, king_sq_copy, queen_sq_copy)
-        #         child_board = board.copy()
-        #         child_board.push(move)
-                
-        #         queen_sq = list(child_board.pieces(chess.QUEEN, not child_board.turn))[0]
-        #         king_sq = list(child_board.pieces(chess.KING, not child_board.turn))[0]
-        #         enemy_king_sq = list(child_board.pieces(chess.KING, child_board.turn))[0]
-                
-        #         if (self._both_kings_same_quadrant(board, queen_sq, king_sq, enemy_king_sq)):
-        #             kings_same_quadrant = True
-        #         if not (child_board.is_checkmate() or child_board.is_check() or child_board.is_stalemate()):
-        #             best_move = move
-        #             print "New best move {0}".format(best_move)
-        #             break
-
         for move in legal_moves:
-            print "Move: {0}".format(move)
             child_board = board.copy()
             child_board.push(move)
             if (child_board.is_checkmate()):
@@ -312,24 +285,15 @@ class EndgameBase:
                 enemy_king_sq = list(child_board.pieces(chess.KING, child_board.turn))[0]
                 enemy_king_area = self._get_king_movement_area(child_board, queen_sq, enemy_king_sq)
                 d = self._distance(child_board, king_sq, enemy_king_sq)
-                print "d: {0} min_d: {1}".format(d, min_total_d)
                 
                 if (enemy_king_trapped):
-                    print "Test"
                     if (d <= min_total_d):
                         if (enemy_king_area <= min_enemy_king_area):
                             min_enemy_king_area = enemy_king_area
                             min_total_d = d
                             prev_best_move = best_move
                             best_move = move
-                    # d = self._distance(child_board, king_sq, queen_sq) + self._distance(child_board, queen_sq, enemy_king_sq) + self._distance(child_board, king_sq, enemy_king_sq)
-                # d = self._distance(child_board, queen_sq, enemy_king_sq)
                 elif (enemy_king_area < min_enemy_king_area):
-                # if (enemy_king_area <= min_enemy_king_area) and (d <= min_total_d):
-                    # if (enemy_king_area == min_enemy_king_area) and (d == min_total_d):
-                    #     if (random.random() < 0.5):
-                    #         continue
-                    # min_total_d = d
                     min_enemy_king_area = enemy_king_area
                     prev_best_move = best_move
                     best_move = move
@@ -337,16 +301,10 @@ class EndgameBase:
         print "First best move {0}".format(best_move)
         
         if not prev_best_move:
-            print "PROBLEM"
-            # assert(kings_same_quadrant)
             min_total_d = float("inf")
             # Take good queen move that doesn't stalemate and doesn't check
             # This is to deal with cases like "8/8/8/8/8/5Q2/8/K1k5 w - - 0 1"
-            # kings_same_quadrant = False
-            print "Best move kings are in same quadrant, looking for queen move"
             for move in legal_moves:
-                print "Move {0}".format(move)
-                print "Move from {0} king was at {1} queen was at {2}".format(move.from_square, king_sq_copy, queen_sq_copy)
                 child_board = board.copy()
                 child_board.push(move)
                 
@@ -358,7 +316,6 @@ class EndgameBase:
                     d = self._distance(child_board, queen_sq, enemy_king_sq)
                     if (self._is_piece_protected_by_king(child_board, queen_sq, king_sq)) and (d < min_total_d):
                         best_move = move
-                        print "New best move {0}".format(best_move)
                         continue
 
         return str(best_move)
