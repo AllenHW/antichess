@@ -101,7 +101,7 @@ if __name__ == "__main__":
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
                 else:
-                    ab = minmax.AlphaBeta(1000, board)
+                    ab = minmax.AlphaBeta(4, 1000, board)
                     move = str(ab.get_best_move(board))
                 end = time()
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
                 if rand_move == 1:
                     enemy_move = make_random_move(board)
                 else:
-                    ab = minmax.AlphaBeta(100, board)
+                    ab = minmax.AlphaBeta(3, 100, board)
                     enemy_move = str(ab.get_best_move(board))
 
                 try:
