@@ -6,6 +6,10 @@ from multiprocessing import Pool
 import operator
 import multiprocessing
 
+DRAW_SCORE = -50
+CHECK_SCORE = 100000
+
+
 def unwrap_self_f(arg, **kwarg):
     return AlphaBeta._get_move_utility(*arg, **kwarg)
 
@@ -33,13 +37,24 @@ class AlphaBeta:
         index, value = max(enumerate(utilities), key=operator.itemgetter(1))
 
         pool.terminate()
+
+        if board.can_claim_threefold_repetition() and len(legal_moves) > 1:
+            second_max = float('-inf')
+            second_max_index = 0
+            for index, util in enumerate(utilities):
+                if util > second_max and util != value:
+                    second_max = util
+                    second_max_index = index
+
+            return legal_moves[second_max_index]
+
         return legal_moves[index]
 
     def min_max(self):
         return self.max_alpha_beta(self.board, 0, float('-inf'), float('inf'))
 
     def max_alpha_beta(self, board, curr_depth, curr_factor, alpha, beta):
-        if curr_depth >= self.depth and curr_factor >= self.factor:
+        if curr_depth >= self.depth:# and curr_factor >= self.factor:
             if is_quiet_position(board):
                 return evaluate(board)
             else:
@@ -54,13 +69,19 @@ class AlphaBeta:
             child_board = board.copy()
             child_board.push(move)
             value = max(value, self.min_alpha_beta(child_board, curr_depth + 1, curr_factor*legal_moves_len, value, beta))
-            if value >= beta or (curr_depth >= self.depth and curr_factor*(i+1) >= self.factor):
+            if value >= beta:# or (curr_depth >= self.depth and curr_factor*(i+1) >= self.factor):
                 break
 
-        return value if move_found else float('-inf')
+        if move_found:
+            return value
+        elif is_draw(board):
+            return -DRAW_SCORE
+        else:
+            return -(CHECK_SCORE - curr_depth)
+        # return value if move_found else float('-inf')
 
     def min_alpha_beta(self, board, curr_depth, curr_factor, alpha, beta):
-        if curr_depth >= self.depth and curr_factor >= self.factor:
+        if curr_depth >= self.depth:# and curr_factor >= self.factor:
             if is_quiet_position(board):
                 return -evaluate(board)
             else:
@@ -75,15 +96,38 @@ class AlphaBeta:
             child_board = board.copy()
             child_board.push(move)
             value = min(value, self.max_alpha_beta(child_board, curr_depth + 1, curr_factor*legal_moves_len, alpha, value))
-            if value <= alpha or (curr_depth >= self.depth and curr_factor*(i+1) >= self.factor):
+            if value <= alpha:# or (curr_depth >= self.depth and curr_factor*(i+1) >= self.factor):
                 break
 
-        return value if move_found else float('inf')
+        if move_found:
+            return value
+        elif is_draw(board):
+            return DRAW_SCORE
+        else:
+            return (CHECK_SCORE - curr_depth)
+
+        # return value if move_found else float('inf')
+
+
+def is_draw(board):
+    if board.is_seventyfive_moves():
+        return True
+
+    if board.is_insufficient_material():
+        return True
+
+    if not any(board.generate_legal_moves()) and not board.is_check():
+        return True
+
+    if board.is_fivefold_repetition():
+        return True
+
+    return False
 
 
 def evaluate(board):
     total_value = 0
-    material_value = 20*evaluate_material(board)
+    material_value = 20 * evaluate_material(board)
     mobility_value = evaluate_mobility_advantage(board)
     if is_end_game(board):
         piece_table_value = evaluate_piece_tables(board, 0.5)
