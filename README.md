@@ -10,7 +10,7 @@ Usage
 ------------
 ```bash
 $ python antichess.py [white | w, black | b]
-b1c3
+[output move (i.e. b1c3)]
 [input move (i.e. h7h6)]
 ```
   
