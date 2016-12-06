@@ -71,7 +71,7 @@ class AlphaBeta:
             child_board = board.copy()
             child_board.push(move)
             value = max(value, self.min_alpha_beta(child_board, curr_depth + 1, curr_factor*legal_moves_len, value, beta))
-            if value >= beta:# or (curr_depth >= self.depth and curr_factor*(i+1) >= self.factor):
+            if value >= beta:
                 break
 
         if move_found:
@@ -100,7 +100,7 @@ class AlphaBeta:
             child_board = board.copy()
             child_board.push(move)
             value = min(value, self.max_alpha_beta(child_board, curr_depth + 1, curr_factor*legal_moves_len, alpha, value))
-            if value <= alpha:# or (curr_depth >= self.depth and curr_factor*(i+1) >= self.factor):
+            if value <= alpha:
                 break
 
         if move_found:

@@ -97,7 +97,7 @@ if __name__ == "__main__":
                     move = str(ab.get_best_move(board))
 
                 try:
-                    print "value: %.10f" % (minmax.evaluate(board))
+                    # print "value: %.10f" % (minmax.evaluate(board))
                     m = board.push_uci(move)
                     print(m.uci())
                     break
@@ -109,14 +109,15 @@ if __name__ == "__main__":
         else:
             # Not our turn wait for their input
             while True:
+                enemy_move = raw_input()
 
-                rand_move = random.randint(1, 1)
+                # rand_move = random.randint(2, 3)
 
-                if rand_move == 1:
-                    enemy_move = make_random_move(board)
-                else:
-                    ab = minmax.AlphaBeta(3, 100, board)
-                    enemy_move = str(ab.get_best_move(board))
+                # if rand_move == 1:
+                #     enemy_move = make_random_move(board)
+                # else:
+                #     ab = minmax.AlphaBeta(3, 100, board)
+                #     enemy_move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(enemy_move)
@@ -126,8 +127,8 @@ if __name__ == "__main__":
                     # print_legal_moves(board)
                     continue
 
-        print board
-        print("")
+        # print board
+        # print("")
 
-    print("GAME OVER!")
-    print(board.result())
+    # print("GAME OVER!")
+    # print(board.result())
