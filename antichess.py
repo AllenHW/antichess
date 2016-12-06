@@ -82,11 +82,12 @@ if __name__ == "__main__":
     while not board.is_game_over():
         if is_white == board.turn:
             # It's our turn
+            use_default = False
 
             while True:
                 endgame_type = get_endgame_type(board)
 
-                if endgame_type and endgame_type <= 4:
+                if not use_default and endgame_type and endgame_type <= 4:
                     eg = endgame.EndgameBase(board, endgame_type)
                     move = eg.get_best_move(board)
                 elif first_move and is_white:
@@ -97,11 +98,11 @@ if __name__ == "__main__":
                     move = str(ab.get_best_move(board))
 
                 try:
-                    # print "value: %.10f" % (minmax.evaluate(board))
                     m = board.push_uci(move)
                     print(m.uci())
                     break
                 except ValueError:
+                    use_default = True
                     # print ("Illegal Move: %s" % move)
                     # print_legal_moves(board)
 
