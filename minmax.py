@@ -54,18 +54,13 @@ class AlphaBeta:
         return self.max_alpha_beta(self.board, 0, float('-inf'), float('inf'))
 
     def max_alpha_beta(self, board, curr_depth, curr_factor, alpha, beta):
-        if curr_depth >= self.depth:# and curr_factor >= self.factor:
-            if is_quiet_position(board):
-                return evaluate(board)
-            else:
-                return quiescent_search(board, alpha, beta, evaluate)
-
         value = alpha
         move_found = False
         legal_moves = list(board.legal_moves)
         legal_moves_len = len(legal_moves)
 
-        if curr_factor >= self.factor or (curr_factor*legal_moves_len) >= self.factor*2:
+        if ( curr_factor >= self.factor or (curr_factor*legal_moves_len) >= self.factor*2 ) \
+                and curr_depth >= self.depth:
             if is_quiet_position(board):
                 return evaluate(board)
             else:
@@ -88,22 +83,17 @@ class AlphaBeta:
         # return value if move_found else float('-inf')
 
     def min_alpha_beta(self, board, curr_depth, curr_factor, alpha, beta):
-        if curr_depth >= self.depth:# and curr_factor >= self.factor:
-            if is_quiet_position(board):
-                return -evaluate(board)
-            else:
-                return -quiescent_search(board, alpha, beta, evaluate)
-
         value = beta
         move_found = False
         legal_moves = list(board.legal_moves)
         legal_moves_len = len(legal_moves)
 
-        if curr_factor >= self.factor and legal_moves_len >= 5:
+        if ( curr_factor >= self.factor or (curr_factor*legal_moves_len) >= self.factor*2 ) \
+                and curr_depth >= self.depth:
             if is_quiet_position(board):
-                return evaluate(board)
+                return -evaluate(board)
             else:
-                return quiescent_search(board, alpha, beta, evaluate)
+                return -quiescent_search(board, alpha, beta, evaluate)
 
         for i, move in enumerate(legal_moves):
             move_found = True
