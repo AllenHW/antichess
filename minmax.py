@@ -64,6 +64,13 @@ class AlphaBeta:
         move_found = False
         legal_moves = list(board.legal_moves)
         legal_moves_len = len(legal_moves)
+
+        if curr_factor >= self.factor or (curr_factor*legal_moves_len) >= self.factor*2:
+            if is_quiet_position(board):
+                return evaluate(board)
+            else:
+                return quiescent_search(board, alpha, beta, evaluate)
+
         for i, move in enumerate(legal_moves):
             move_found = True
             child_board = board.copy()
@@ -91,6 +98,13 @@ class AlphaBeta:
         move_found = False
         legal_moves = list(board.legal_moves)
         legal_moves_len = len(legal_moves)
+
+        if curr_factor >= self.factor and legal_moves_len >= 5:
+            if is_quiet_position(board):
+                return evaluate(board)
+            else:
+                return quiescent_search(board, alpha, beta, evaluate)
+
         for i, move in enumerate(legal_moves):
             move_found = True
             child_board = board.copy()

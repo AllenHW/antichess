@@ -76,7 +76,6 @@ if __name__ == "__main__":
     DEFAULT_FIRST_MOVE = "b1c3"
 
     # Initialize the board
-    # board = antichess_board.AntichessBoard("4k3/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
     board = antichess_board.AntichessBoard()
 
     # Input loop
@@ -86,8 +85,6 @@ if __name__ == "__main__":
 
             while True:
                 endgame_type = get_endgame_type(board)
-                # move = raw_input("Our Move: ")
-                # move = make_random_move(board)
 
                 if endgame_type and endgame_type <= 4:
                     eg = endgame.EndgameBase(board, endgame_type)
@@ -96,7 +93,7 @@ if __name__ == "__main__":
                     move = DEFAULT_FIRST_MOVE
                     first_move = False
                 else:
-                    ab = minmax.AlphaBeta(3, 1000, board)
+                    ab = minmax.AlphaBeta(5, 1000, board)
                     move = str(ab.get_best_move(board))
 
                 try:
@@ -107,20 +104,19 @@ if __name__ == "__main__":
                 except ValueError:
                     # print ("Illegal Move: %s" % move)
                     # print_legal_moves(board)
+
                     continue
         else:
             # Not our turn wait for their input
             while True:
-                # enemy_move = raw_input("Move: ")
-                enemy_move = raw_input()
 
-                # rand_move = random.randint(1, 3)
+                rand_move = random.randint(1, 1)
 
-                # if rand_move == 1:
-                #     enemy_move = make_random_move(board)
-                # else:
-                #     ab = minmax.AlphaBeta(3, 100, board)
-                #     enemy_move = str(ab.get_best_move(board))
+                if rand_move == 1:
+                    enemy_move = make_random_move(board)
+                else:
+                    ab = minmax.AlphaBeta(3, 100, board)
+                    enemy_move = str(ab.get_best_move(board))
 
                 try:
                     m = board.push_uci(enemy_move)
@@ -130,8 +126,8 @@ if __name__ == "__main__":
                     # print_legal_moves(board)
                     continue
 
-        # print board
-        # print("")
+        print board
+        print("")
 
-    # print("GAME OVER!")
-    # print(board.result())
+    print("GAME OVER!")
+    print(board.result())
