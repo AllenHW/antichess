@@ -8,9 +8,11 @@ Implemented antichess rules, min-max algorithm using alphabeta pruning, evaluati
 
 Usage
 ------------
-.. code::
-  $ python antichess.py [white | w, black | b]
+```bash
+$ python antichess.py [white | w, black | b]
   $ b1c3
   $ [input (i.e. h7h6)]
+```
+  
   
 
