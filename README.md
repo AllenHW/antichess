@@ -10,8 +10,8 @@ Usage
 ------------
 ```bash
 $ python antichess.py [white | w, black | b]
-  $ b1c3
-  $ [input (i.e. h7h6)]
+b1c3
+[input move (i.e. h7h6)]
 ```
   
   
